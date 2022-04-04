@@ -1,6 +1,6 @@
 
 plot_firing_responsive <- function(data, x_axis_order, title, y_label, x_label){
-
+  
   ggplot2::ggplot(data = data) +
     ggplot2::theme_bw() +
     ggplot2::geom_point(
@@ -17,6 +17,7 @@ plot_firing_responsive <- function(data, x_axis_order, title, y_label, x_label){
                            group = neuron_id,
                            color = responsive)) +
     ggplot2::facet_grid(responsive ~ Hz) +
+    theme(axis.text.x = element_text(angle = 90)) +
     ggplot2::scale_y_log10()
   
 }
