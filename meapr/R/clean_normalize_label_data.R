@@ -1,8 +1,8 @@
 
-rm_time_off_baseline <- function(exp, seconds){
+rm_time_off_baseline <- function(exp, baseline_cutoff){
 
   exp$firing$begin <- ifelse(exp$firing$treatment == "Baseline",
-                             exp$firing$begin + seconds,
+                             exp$firing$begin + baseline_cutoff,
                              exp$firing$begin)
 
   exp$firing <- exp$firing %>% dplyr::filter(time_step >= begin, time_step <= end)
@@ -115,9 +115,9 @@ label_Hz <- function(exp){
 }
 
 
-all_functions <- function(exp, seconds, exp_name, treatment_label,
-                          min_threshold, max_threshold){
-  exp <- rm_time_off_baseline(exp, seconds)
+clean_norm_label <- function(exp, baseline_cutoff, exp_name, treatment_label,
+                             min_threshold, max_threshold){
+  exp <- rm_time_off_baseline(exp, baseline_cutoff)
   exp <- rm_60s_treatments(exp = exp$firing)
   exp <- exposure_counts(exp = exp)
   exp <- norm_firing(exp = exp)
