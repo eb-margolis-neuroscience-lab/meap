@@ -1,0 +1,31 @@
+# protocol_parameters.yaml
+
+# Protocol Parameters file format version 0.1
+# This is a draft YAML file for data from multiple slice runs
+# that all use a similar experimantl treatment protocol.
+# Subject to changes as needed
+
+protocol_description: Apply DAMGO and other treatments
+
+data_cleaning:
+   activity_threshold: .5
+ 
+models:
+   firing_rate_model:
+        model_type: ...
+   dose_response_model:
+        model_type: sigmoid
+        priors: ...
+        inits: ...
+
+drugs_used: ...
+#    - NMDA
+#        drug_vendor: Zadina , Hellobio
+#        drug_batch: ...
+#        dose: 
+#            - 20uM
+#            - 10nM
+#            - 100nM
+#    - Apamin
+#        drug_vendor: Zadina , Hellobio
+#        drug_batch: ...
