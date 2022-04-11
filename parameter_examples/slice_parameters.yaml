@@ -1,27 +1,24 @@
-# run_parameters.yaml
+# slice_parameters.yaml
 
-# Run/Slice Parameters file format version 0.3
+# Slice Parameters file format version 0.3
 # This is a draft YAML file for data in a single experiment run
 # Subject to changes as needed
 
 paths:
-    base: <To be set to the local computer's data directory>
+    base: <To be set to the local computer's data directory>/
     protocol: HB_139_DAMGO/
-    unit: 20220825_12h24m37s/20200825_12h24m37s_units_ts.mat
-    treatment: 20220825_12h24m37s/20200825_12h24m37s_treatments.csv
-    photo: 20220825_12h24m37s/20200825_12h24m37s.jpg
+    slice: 20220825_12h24m37s/
+    unit: 20200825_12h24m37s_units_ts.mat
+    treatment: 20200825_12h24m37s_treatments.csv
+    photo: 20200825_12h24m37s.jpg
 
-run_metadata:
-    name: 20200825_12h24m37s
+slice_metadata:
     type: Dose/Response
     protocol: HB_139_DAMGO
     date: 2020-08-25
     animal_id: ...
     region: VTA
     recording_site: middle
-    researchers: Elayne Vieira Dias, Elyssa Margolis
-    cut_by: Elayne Vieira Dias
-    run_by: Elayne Vieira Dias
     notes:  'Use this for notes on specific slice run. Because this 
        description is in quotes, YAML can read it as a single long block of 
        wrapped text, even though it is multiple lines in YAML file. 
@@ -33,9 +30,8 @@ run_metadata:
        this kind of text block will sometimes be less readable than creating 
        an actual structured list as data in YAML'
 
-data_cleaning:
-   activity_threshold: .5
-
-spike_sorting:
-   method: matlab ez-spike
- 
+# OPTIONAL DATA - override higher level defaults for this slice
+# spike_sorting:
+#    method: matlab ez-spike
+cut_by: Andrea Sanders
+run_by: Andrea Sanders
