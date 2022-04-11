@@ -1,3 +1,10 @@
+#'
+#'
+#'
+#'
+#'
+#'
+#'@export 
 
 treatment_log_dose <- function(labeled_data){
 
