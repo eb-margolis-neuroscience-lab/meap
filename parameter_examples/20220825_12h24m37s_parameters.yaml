@@ -1,23 +1,20 @@
-# parameters.yaml
+# run_parameters.yaml
 
-# Parameters file format version 0.2
+# Run/Slice Parameters file format version 0.3
 # This is a draft YAML file for data in a single experiment run
 # Subject to changes as needed
-
-# how to search database, interface
-# spreadsheet to yaml?
 
 paths:
     base: <To be set to the local computer's data directory>
     protocol: HB_139_DAMGO/
-    unit: 825_12h24m37s/20200825_12h24m37s_units_ts.mat
-    treatment: 825_12h24m37s/20200825_12h24m37s_treatments.csv
-    photo: 20200825_12h24m37s.jpg
+    unit: 20220825_12h24m37s/20200825_12h24m37s_units_ts.mat
+    treatment: 20220825_12h24m37s/20200825_12h24m37s_treatments.csv
+    photo: 20220825_12h24m37s/20200825_12h24m37s.jpg
 
-experiment_metadata:
+run_metadata:
     name: 20200825_12h24m37s
     type: Dose/Response
-    description: Apply DAMGO and other treatments
+    protocol: HB_139_DAMGO
     date: 2020-08-25
     animal_id: ...
     region: VTA
@@ -25,30 +22,20 @@ experiment_metadata:
     researchers: Elayne Vieira Dias, Elyssa Margolis
     cut_by: Elayne Vieira Dias
     run_by: Elayne Vieira Dias
+    notes:  'Use this for notes on specific slice run. Because this 
+       description is in quotes, YAML can read it as a single long block of 
+       wrapped text, even though it is multiple lines in YAML file. 
 
-drugs_used:
-#    - NMDA
-#        drug_vendor: Zadina , Hellobio
-#        drug_batch: ...
-#        dose: 
-#            - 20uM
-#            - 10nM
-#            - 100nM
-#    - Apamin
-#        drug_vendor: Zadina , Hellobio
-#        drug_batch: ...
-    
+       Adding an extra blank line inside the same block text quote will be 
+       read by YAML as a new line.
+
+       Attempting to add lists, or other complex grammatical structures into 
+       this kind of text block will sometimes be less readable than creating 
+       an actual structured list as data in YAML'
+
 data_cleaning:
    activity_threshold: .5
 
 spike_sorting:
    method: matlab ez-spike
  
-models:
-   firing_rate_model:
-        model_type: ...
-   dose_response_model:
-        model_type: sigmoid
-        priors: ...
-        inits: ...
-

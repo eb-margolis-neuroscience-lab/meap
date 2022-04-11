@@ -1,11 +1,29 @@
 # protocol_parameters.yaml
 
-# Protocol Parameters file format version 0.1
+# Protocol Parameters file format version 0.2
 # This is a draft YAML file for data from multiple slice runs
-# that all use a similar experimantl treatment protocol.
+# that all use a similar experimental treatment protocol.
 # Subject to changes as needed
 
-protocol_description: Apply DAMGO and other treatments
+protocol_metadata:
+   name: HB_139_DAMGO
+   description: 'Apply DAMGO and other treatments. Because this 
+   description is in quotes, YAML can read it as a single long block of 
+   wrapped text, even though it is multiple lines in YAML file. 
+
+   Adding an extra blank line inside the same block text quote will be 
+   read by YAML as a new line.
+
+   Attempting to add lists, or other complex grammatical structures into 
+   this kind of text block will sometimes be less readable than creating 
+   an actual structured list as data in YAML'
+
+# list of run/slice names. lists have a new line and hyphen before each item
+runs:
+   - 20220825_12h24m37s
+   - 20220825_13h36m25s
+   - 20220825_15h01m13s
+   - 20220825_16h06m19s
 
 data_cleaning:
    activity_threshold: .5
@@ -18,14 +36,18 @@ models:
         priors: ...
         inits: ...
 
-drugs_used: ...
-#    - NMDA
-#        drug_vendor: Zadina , Hellobio
-#        drug_batch: ...
-#        dose: 
-#            - 20uM
-#            - 10nM
-#            - 100nM
-#    - Apamin
-#        drug_vendor: Zadina , Hellobio
-#        drug_batch: ...
+drugs_used:
+    - NMDA:
+        drug_vendor: Zadina, Hellobio
+        drug_batch: ...
+        doses: 
+            - 20uM
+            - 10nM
+            - 100nM
+    - Apamin:
+        drug_vendor: Zadina , Hellobio
+        drug_batch: ...
+        doses: 
+            - 20uM
+            - 10nM
+            - 100nM
