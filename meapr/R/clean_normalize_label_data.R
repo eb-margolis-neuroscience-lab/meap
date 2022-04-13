@@ -1,3 +1,10 @@
+#'
+#'
+#'
+#'
+#'
+#'
+#'@export
 
 rm_time_off_baseline <- function(exp, baseline_cutoff){
 

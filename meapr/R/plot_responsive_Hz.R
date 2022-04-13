@@ -1,3 +1,10 @@
+#'
+#'
+#'
+#'
+#'
+#'
+#'@export
 
 plot_firing_responsive <- function(data, x_axis_order, title, y_label, x_label){
   
