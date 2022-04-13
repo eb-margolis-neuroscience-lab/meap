@@ -1,0 +1,39 @@
+# protocol_parameters.yaml
+
+# Protocol Parameters file format version 0.2
+# This is a draft YAML file for data from multiple slice runs
+# that all use a similar experimental treatment protocol.
+# Subject to changes as needed
+
+protocol_metadata:
+   researchers: Elayne Vieira Dias, Elyssa Margolis
+   cut_by: Elayne Vieira Dias
+   run_by: Elayne Vieira Dias
+   description: 'Apply DAMGO and other treatments. Because this 
+   description is in quotes, YAML can read it as a single long block of 
+   wrapped text, even though it is multiple lines in YAML file. 
+
+   Adding an extra blank line inside the same block text quote will be 
+   read by YAML as a new line.
+
+   Attempting to add lists, or other complex grammatical structures into 
+   this kind of text block will sometimes be less readable than creating 
+   an actual structured list as data in YAML'
+
+spike_sorting:
+   method: matlab ez-spike
+
+data_cleaning:
+   activity_threshold: .5
+
+models:
+   firing_rate_model:
+        model_type: ...
+   dose_response_model:
+        model_type: sigmoid
+        priors: ...
+        inits: ...
+
+# # move to table (csv, tsv)
+# drugs_used:
+#   use dose in numbers, not units (ie mmol) 
