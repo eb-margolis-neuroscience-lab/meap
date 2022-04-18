@@ -5,9 +5,9 @@
 # Subject to changes as needed
 
 paths:
-    base: <To be set to the local computer's data directory>/
+    base: /Users/walter/Data/med64/experiment/
     protocol: HB_139_DAMGO/
-    slice: 20220825_12h24m37s/
+    slice: 825_12h24m37s/
     unit: 20200825_12h24m37s_units_ts.mat
     treatment: 20200825_12h24m37s_treatments.csv
     photo: 20200825_12h24m37s.jpg
