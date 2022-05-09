@@ -24,7 +24,7 @@ __list last updated 2022-04-12__
 ```
 conda install jupyterlab
 conda install matplotlib seaborn scipy
-conda install pyyaml
+conda install pyyaml xlrd
 ```
 
 Start the __Jupyter Lab__ application in a browser window using the terminal command:   
