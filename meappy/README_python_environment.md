@@ -10,7 +10,7 @@ These intructions will not use the "Navigator". Instead, it will use command lin
 
 In the terminal shell, go to the directory that will contain the python code to be run.   
 Example:   
-`cd C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code>`   
+`cd C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code`   
 
 Create the new Anaconda __virtual environment__ for Jupyter Lab.    
 This example names the virtual env "jupyterlab"   
@@ -35,7 +35,7 @@ Start the __Jupyter Lab__ application in a browser window using the terminal com
 Open terminal window with application “Anaconda Powershell Prompt (anaconda 3)"   
 Use command line in terminal window to go to your local computer's Python code folder.    
 Example:   
-`cd C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code>`
+`cd C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code`
 
 Activate the anaconda virtual environment for Jupyter notebooks   
 `conda activate jupyterlab`   
