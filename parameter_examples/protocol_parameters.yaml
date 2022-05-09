@@ -6,18 +6,23 @@
 # Subject to changes as needed
 
 protocol_metadata:
-   researchers: Elayne Vieira Dias, Elyssa Margolis
-   protocol: '...'
-   description: 'Apply DAMGO and other treatments. Because this 
-   description is in quotes, YAML can read it as a single long block of 
-   wrapped text, even though it is multiple lines in YAML file. 
+    researchers: Elayne Vieira Dias, Elyssa Margolis
+    protocol: '...'
+    description: 'This `description` field in the protocol_parameter.yaml 
+        file will not be overwritten. [In contrast the `notes` section of 
+        the slice_parameter.yaml file will be overwritten by notes from 
+        the experiment.xls file.]
 
-   Adding an extra blank line inside the same block text quote will be 
-   read by YAML as a new line.
+        This description is in quotes, therefore YAML can read it as a single 
+        long block of 
+         wrapped text, even though it is multiple lines in YAML file. 
 
-   Attempting to add lists, or other complex grammatical structures into 
-   this kind of text block will sometimes be less readable than creating 
-   an actual structured list as data in YAML'
+         Adding an extra blank line inside the same block text quote will be 
+         read by YAML as a new line.
+
+         Attempting to add lists, or other complex grammatical structures into 
+         this kind of text block will sometimes be less readable than creating 
+         an actual structured list as data in YAML'
 
 spike_sorting:
    method: matlab ez-spike

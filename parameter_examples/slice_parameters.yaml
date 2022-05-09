@@ -1,6 +1,6 @@
 # slice_parameters.yaml
 
-# Slice Parameters file format version 0.3
+# Slice Parameters file format version 0.4
 # This is a draft YAML file for data in a single experiment run
 # Subject to changes as needed
 
@@ -21,18 +21,20 @@ slice_metadata:
     run_by: Andrea Sanders
     region: VTA
     recording_site: '[ventral, medial, lateral]'
-    notes:  'Use this for notes on specific slice run. Because this 
-       description is in quotes, YAML can read it as a single long block of 
-       wrapped text, even though it is multiple lines in YAML file. 
+    notes:  'This notes section of the slice_parameter.yaml file will be 
+        overwritten by notes from the experiment.xls file.  [In contrast the
+        `description` field in the protocol_parameter.yaml file will not be
+        overwritten.
 
-       Adding an extra blank line inside the same block text quote will be 
-       read by YAML as a new line.
+        Use this for notes on specific slice run. Because this 
+        description is in quotes, YAML can read it as a single long block of 
+        wrapped text, even though it is multiple lines in YAML file. 
 
-       Attempting to add lists, or other complex grammatical structures into 
-       this kind of text block will sometimes be less readable than creating 
-       an actual structured list as data in YAML'
+        Adding an extra blank line inside the same block text quote will be 
+        read by YAML as a new line.
 
-# OPTIONAL DATA - override higher level defaults for this slice
-# spike_sorting:
-#    method: matlab ez-spike
+        Attempting to add lists, or other complex grammatical structures into 
+        this kind of text block will sometimes be less readable than creating 
+        an actual structured list as data in YAML'
+
 

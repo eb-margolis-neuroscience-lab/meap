@@ -3,11 +3,11 @@
 # These configuration files can be set up for each computer
 # use python dataclasses
 USER_PATHS = {'elayne': {'meap': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap',
-                         'output': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code',
-                         'exp_xlsx': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code'
+                         'output': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap_yaml_output',
+                         'exp_xlsx': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap\parameter_examples\MED64 Experiments_cols.xls'
                         },
               'walter': {'meap': r'/Users/walter/Src/meap',
-                         'output': r'/Users/walter/Src/meap/output',
+                         'output': r'/Users/walter/Src/meap_yaml_output',
                          'exp_xlsx': r'/Users/walter/Src/meap/parameter_examples/MED64 Experiments_cols.xls'
                         },
              }

@@ -8,7 +8,7 @@ import pathlib
 from configuration import (USER_PATHS, USER, XL_TAB, XL_COLS, 
     ROW_ID_LIST)
 
-# ipywidget display settings for jupyter lab notebook
+## ipywidget display settings for jupyter lab notebook
 # import ipywidgets as widgets
 # from ipywidgets import Layout
 # ext_text = Layout(width='800px')
@@ -71,7 +71,6 @@ def xl_to_slice_params(xl, slice_param_template):
     slice_params['slice_metadata']['protocol'] = XL_TAB
     slice_params['slice_metadata']['cut_by'] = xl['cut_by']
     slice_params['slice_metadata']['run_by'] = xl['run_by']
-    slice_params['slice_metadata']['animal_id'] = '...'
     slice_params['slice_metadata']['recording_site'] = '[dorsal, medial, ventral]'
 
     unit_timestamps_filename = slice_id + '_units_ts.mat'
@@ -223,10 +222,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # override constants in configuration.py
-    # USER = set_user('walter')
-    # XL_TAB = 'NMDA_Apamin'
-    # print(USER_PATHS[USER]['protocol_output'])
-
     main()
 
