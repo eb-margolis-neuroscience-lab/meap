@@ -1,26 +1,18 @@
 import yaml
 import os
-import ipywidgets as widgets
 from IPython.display import display
-from ipywidgets import Layout
-from pprint import pprint
 from datetime import datetime 
 import xlrd
 import pathlib
 
 from configuration import (USER_PATHS, USER, XL_TAB, XL_COLS, 
     ROW_ID_LIST)
-# import configuration
-# from importlib import reload
-# reload(configuration)
-# for constant in (USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST):
-#     reload(constant)
-# for constant in (USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST):
-#     constant = configuration.constant 
 
 # ipywidget display settings for jupyter lab notebook
-ext_text = Layout(width='800px')
-ext_xlrow = Layout(width='1200px',  height='40px')
+# import ipywidgets as widgets
+# from ipywidgets import Layout
+# ext_text = Layout(width='800px')
+# ext_xlrow = Layout(width='1200px',  height='40px')
 
 
 def set_output_paths(user=USER, user_paths=USER_PATHS, protocol_dir = r''):

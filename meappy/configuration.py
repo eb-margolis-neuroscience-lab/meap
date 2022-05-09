@@ -1,7 +1,6 @@
 # configuration.py
 
-# for seperate configuration.py file then import configuration/settings/constants ...
-# These configuration files can be set up seperately for each computer
+# These configuration files can be set up for each computer
 # use python dataclasses
 USER_PATHS = {'elayne': {'meap': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap',
                          'output': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code',
