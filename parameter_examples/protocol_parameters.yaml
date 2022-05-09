@@ -7,8 +7,7 @@
 
 protocol_metadata:
    researchers: Elayne Vieira Dias, Elyssa Margolis
-   cut_by: Elayne Vieira Dias
-   run_by: Elayne Vieira Dias
+   protocol: '...'
    description: 'Apply DAMGO and other treatments. Because this 
    description is in quotes, YAML can read it as a single long block of 
    wrapped text, even though it is multiple lines in YAML file. 

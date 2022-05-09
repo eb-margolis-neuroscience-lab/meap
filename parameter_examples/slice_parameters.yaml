@@ -16,9 +16,11 @@ slice_metadata:
     type: Dose/Response
     protocol: HB_139_DAMGO
     date: 2020-08-25
-    animal_id: ...
+    time: 12h24m37s
+    cut_by: Andrea Sanders
+    run_by: Andrea Sanders
     region: VTA
-    recording_site: middle
+    recording_site: '[ventral, medial, lateral]'
     notes:  'Use this for notes on specific slice run. Because this 
        description is in quotes, YAML can read it as a single long block of 
        wrapped text, even though it is multiple lines in YAML file. 
@@ -33,5 +35,4 @@ slice_metadata:
 # OPTIONAL DATA - override higher level defaults for this slice
 # spike_sorting:
 #    method: matlab ez-spike
-cut_by: Andrea Sanders
-run_by: Andrea Sanders
+
