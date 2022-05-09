@@ -40,6 +40,7 @@ vignettes/*.pdf
 
 # python jupyter
 *checkpoint.ipynb
+__pycache__
 
 # Mac OS files
 .DS_Store
