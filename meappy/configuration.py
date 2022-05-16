@@ -4,16 +4,22 @@
 # use python dataclasses
 USER_PATHS = {'elayne': {'meap': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap',
                          'output': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap_yaml_output',
-                         'exp_xlsx': r'C:\Users\fieldslab2\Desktop\Lab\MED64_Exp\MED64_ExperimentsForAnalysis.xls'
+                         'exp_xlsx': r'C:\Users\fieldslab2\Desktop\Lab\MED64_Exp\MED64_ExperimentsForAnalysis.xls',
+                         'data_dir' = r'C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\experiment\\HB_139_DAMGO\\20200825_12h24m37s',
+                         'slice_params_file' = 'slice_parameters.yaml',
+                         'product_dir' = r'C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\product\\HB_139_DAMGO\\'
                         },
               'walter': {'meap': r'/Users/walter/Src/meap',
                          'output': r'/Users/walter/Src/meap_yaml_output',
-                         'exp_xlsx': r'/Users/walter/Src/meap/parameter_examples/MED64 Experiments_cols.xls'
+                         'exp_xlsx': r'/Users/walter/Src/meap/parameter_examples/MED64_ExperimentsForAnalysis.xls',
+                         'data_dir' = r'/Users/walter/Data/med64/experiment/HB_139_DAMGO/825_12h24m37s',
+                         'slice_params_file' = r'slice_parameters.yaml',
+                         'product_dir' = r'/Users/walter/Data/med64/product/HB_139_DAMGO/'
                         },
              }
 # C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap\parameter_examples\MED64 Experiments_cols.xls
 
-USER = 'elayne' # 'walter' # 'elayne'
+USER = 'walter' # 'walter' # 'elayne'
 
 XL_TAB = 'LHb' # 'VTA_NMDA_Apamin' #'VTA_NMDA' 
 		# 'HbL' # 'HB_139_DAMGO'
