@@ -5,16 +5,14 @@
 USER_PATHS = {'elayne': {'meap': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap',
                          'output': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap_yaml_output',
                          'exp_xlsx': r'C:\Users\fieldslab2\Desktop\Lab\MED64_Exp\MED64_ExperimentsForAnalysis.xls',
-                         'data_dir' = r'C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\experiment\\HB_139_DAMGO\\20200825_12h24m37s',
-                         'slice_params_file' = 'slice_parameters.yaml',
-                         'product_dir' = r'C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\product\\HB_139_DAMGO\\'
+                         'data_dir': r'C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\experiment\\',
+                         'product_dir': r'C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\product\\'
                         },
               'walter': {'meap': r'/Users/walter/Src/meap',
                          'output': r'/Users/walter/Src/meap_yaml_output',
                          'exp_xlsx': r'/Users/walter/Src/meap/parameter_examples/MED64_ExperimentsForAnalysis.xls',
-                         'data_dir' = r'/Users/walter/Data/med64/experiment/HB_139_DAMGO/825_12h24m37s',
-                         'slice_params_file' = r'slice_parameters.yaml',
-                         'product_dir' = r'/Users/walter/Data/med64/product/HB_139_DAMGO/'
+                         'data_dir': r'/Users/walter/Data/med64/experiment/',
+                         'product_dir': r'/Users/walter/Data/med64/product/'
                         },
              }
 # C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap\parameter_examples\MED64 Experiments_cols.xls
@@ -31,3 +29,7 @@ XL_COLS = ['date', 'cut_by', 'run_by', 'region', 'project',\
 
 # ROW_ID_LIST = ['20211006_15h58m38s', '20211005_17h33m55s'] #, '20211006_15h58m38s']  # NMDA_Apamin
 ROW_ID_LIST = ['20200825_12h24m37s', '20200825_13h36m25s'] # LHb
+
+# Analysis Paths
+protocol_dir = r'HB_139_DAMGO'
+slice_dir = r'825_12h24m37s'
