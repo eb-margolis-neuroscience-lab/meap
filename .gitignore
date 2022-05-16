@@ -41,6 +41,7 @@ vignettes/*.pdf
 # python jupyter
 *checkpoint.ipynb
 __pycache__/
+.ipynb_checkpoints/
 
 # Mac OS files
 .DS_Store
