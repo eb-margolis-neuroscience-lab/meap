@@ -89,31 +89,12 @@ def read_tx_file(tx_filename):
     return tx_times
 
 
-def get_expt_data(data_dir, expt_id, unit_files, tx_files):
-    """Version v0 (2021) for legacy data format
-    called in old functions:
-        get_mean_firing_rates, 
-        data_to_qq
-    and also called by these functions in new Notebook
-
-    called only by main() in med_64.py
-
-    To Alternate: ... this may be only tough one...
-    change the code to use this v0.get_expt_data after importing as such
-    these changes will need to be made in the notebook or the med64_data.main()
-    and only on about 3 lines.  These could easily be flagged with a constant
-    and if statements to allow alternation with a single line change for testing.
-
-    the change to med64_data.main() only needed if using to analyze plots
-    for autocorrelograms.  So for Observable, just make these changes for
-    the few cells that use them, and an IF CONSTANT in the two functions that
-    use this function.
+def get_expt_data(unit_filename, tx_filename):
+    """change to use names as keys. 
+    create one large data struct with {expt_id: file_type: path}
+    Then pass the entire expts_paths dict.
     """
-    unit_filename = data_dir + unit_files[expt_id]
     units_data = read_units_file(unit_filename)
-
-    tx_filename = data_dir + tx_files[expt_id]
     tx_times = read_tx_file(tx_filename)
-    
     return units_data, tx_times
 
