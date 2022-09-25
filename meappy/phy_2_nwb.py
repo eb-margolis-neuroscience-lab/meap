@@ -160,5 +160,4 @@ if __name__ == '__main__':
         main(phy_dir, med64_bin_path=med64_bin_path)
     else:
         main(phy_dir)
-    
-#  python phy_2_nwb.py /Users/walter/Data/phy_elyssa_drive/SN_test_10/20211109_15h09m07s.modat.GUI /Users/walter/Data/latest_modat/20211105_15h48m31s.modat.bin
+   
