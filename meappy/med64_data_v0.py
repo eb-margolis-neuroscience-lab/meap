@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from pprint import pprint
-
 import os, re
-import yaml
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,38 +14,43 @@ bins_per_sec = 1000 # make 1000 for 1Hz analysis
 lag_bins = 5
 lag_bins_ms = np.arange(-lag_bins, lag_bins + 1) * (1000 / bins_per_sec)
 
-SHOW_PLOTS = True
 
 
-def show_plot(plot):
-    if SHOW_PLOTS:
-        plot.show()
+def find_expt_files(data_dir):
+    files = os.listdir(data_dir)
 
+    re_units = re.compile(r'^units.*')
+    re_tx = re.compile(r'^treatmentinfo.*')
+    re_expr_id = re.compile(r"([0-9]{3}_[0-9]{2}h[0-9]{2}m[0-9]{2}s)\.['csv|mat']{3}")
 
-def find_expt_files(yaml_file):    
-    with open(yaml_file, 'r') as file:
-        med64_data = yaml.safe_load(file)
+    unit_files = dict()
+    tx_files = dict()
 
-    # pprint(med64_data, sort_dicts=False, indent=4)
+    for file in files:
+        expr_id = re_expr_id.findall(file)
+        if expr_id:
+            units_file = re_units.findall(file)
+            if units_file:
+                unit_files[expr_id[0]] = units_file[0]
+            tx_file = re_tx.findall(file)
+            if tx_file:
+                tx_files[expr_id[0]] = tx_file[0]
+    expt_list = sorted(list(unit_files.keys()))
+
+    print('FOUND Data FILES:')
+    print('Experiment IDs: \n\t' + '\n\t'.join(expt_list))
+    print('Units Files: \n\t' + '\n\t'.join(unit_files.values()))
+    print('Treatment Files: \n\t' + '\n\t'.join(tx_files.values()))
     
-    paths = med64_data['paths']
-    slice_path = os.path.join(paths['base'], paths['protocol'], paths['slice'])
-    
-    slice_name = paths['slice']
-    tx_file = os.path.join(slice_path, paths['treatment'])
-    unit_file = os.path.join(slice_path, paths['unit'])
-
-    #  expt_list[0] now replaced with slice_name
-    # tx_files now tx_file without s
-    return  slice_name, tx_file, unit_file
+    return expt_list, tx_files, unit_files
 
 
 def read_tx_file(tx_filename):
     tx_times = dict()
     with open(tx_filename) as csvDataFile:
-        csvReader = csv.DictReader(csvDataFile)
+        csvReader = csv.reader(csvDataFile)
         for row in csvReader:
-            tx_times[row[" label"]] = float(row['begin'])
+            tx_times[row[1]] = float(row[0])
     return tx_times
 
 
@@ -80,14 +82,13 @@ def read_units_file(unit_filename):
     return extract_units_mat_data(units_mat)
 
 
-def get_expt_data(unit_filename, tx_filename):
-    # get_expt_data(data_dir, expt_id):
-    """change to use names as keys. 
-    create one large data struct with {expt_id: file_type: path}
-    Then pass the entire expts_paths dict.
-    """
+def get_expt_data(data_dir, expt_id, unit_files, tx_files):
+    unit_filename = data_dir + unit_files[expt_id]
     units_data = read_units_file(unit_filename)
+
+    tx_filename = data_dir + tx_files[expt_id]
     tx_times = read_tx_file(tx_filename)
+    
     return units_data, tx_times
 
 
@@ -107,7 +108,7 @@ def get_hist_bins(timestamps, bin_sec):
     Returns ND array of beginning time of each bin, plus end 
     time of last bin. Starts first bin at zero.
     """
-    num_bins = int(np.floor(timestamps.max() / bin_sec)) + 1
+    num_bins = np.floor(timestamps.max() / bin_sec) + 1
     start = 0
     stop = num_bins * bin_sec
     return np.linspace(start, stop, num = (num_bins+1))
@@ -122,7 +123,7 @@ def plot_expt_histo(timestamps, tx_times, bin_sec):
     ax2 = ax1.twinx()
 
     # plot kernel density
-    density = stats.gaussian_kde(timestamps)
+    density = stats.kde.gaussian_kde(timestamps)
     x = np.arange(timestamps.min(), timestamps.max(), 0.1)
     kde_x = density(x)
     ax2.plot(x, kde_x)
@@ -149,7 +150,7 @@ def plot_expt_histo(timestamps, tx_times, bin_sec):
     ax1.set_ylabel('Unit Activity (Hz)')
     ax1.set_xlabel('Experiment Time (s)')
     ax2.set_ylabel('Kernel Density')
-    show_plot(plt)      # plt.show()
+    plt.show()
 
 
 def get_array_from_ts(timestamps, ts_index_max=None):
@@ -203,60 +204,6 @@ def make_grid_array(num_units):
     x.shape
     return x.reshape(dim1,dim2)
 
-
-def hist_subplot(units_data, unit, tx_times, bin_sec, row, col, axs1, axs2, nrows, ncols):
-    timestamps = units_data[unit]['timestamps']
-
-    num_ts = timestamps.shape[0]
-    bins = get_hist_bins(timestamps, bin_sec)
-    max_tx = max(tx_times.values())
-
-    # plot hist
-    # N is the count in each bin, bins is the lower-limit of the bin
-    counts, bin_edges = np.histogram(timestamps, bins=bins)
-    N, bins, patches = axs1[row, col].hist(bins[:-1], bins=bins, weights=(counts/bin_sec), alpha=0.4)
-
-    # plot rug
-    thin_rug = rug_thinning_factor(num_ts) # improves visualization, make func
-    rug_height = N.min()
-    axs1[row, col].plot(timestamps[::thin_rug], [rug_height]*len(timestamps[::thin_rug]), '|', color='k');
-
-    # plot treatment boundary times
-    y_span = np.linspace(0, N.max(), num=2)
-    
-    for tx, tx_time in tx_times.items():
-        axs1[row, col].plot((tx_time * np.ones(2)), y_span)
-        axs1[row, col].annotate(tx, (tx_time, (N.max()*0.1)), rotation=90)
-
-    plt.xlim(0, max_tx)
-
-    axs1[row, col].set_title('Unit # ' + str(unit)) 
-    if col == 0:
-        axs1[row, col].set_ylabel('Unit Activity (Hz)')
-    if row == (nrows-1):
-        axs1[row, col].set_xlabel('Experiment Time (s)')
-
-
-def plot_hist_grid(units_data, tx_times, bin_sec, num_units):
-    grid_array = make_grid_array(num_units)
-    nrows, ncols = grid_array.shape
-
-    fig, axs1 = plt.subplots(*grid_array.shape, sharex='all', figsize=(ncols*4,nrows*3))
-    axs2 = axs1 
-
-    for row, cols in enumerate(grid_array):
-        for col, unit in enumerate(cols):
-            if not (unit == 0 and col != 0):
-                hist_subplot(units_data, unit, tx_times, bin_sec, row, col, axs1, axs2, nrows, ncols)
-    return fig
-
-
-
-
-
-
-
-### plot_autocorr_grid and plot_crosscorr_grid do not appear in notebook
 
 def plot_autocorr_grid(units_data, num_units):
     """
@@ -313,56 +260,48 @@ def plot_crosscorr_grid(units_data, reference_unit, num_units):
     plt.suptitle('Cross-Correlograms', y=(1 - 0.008*nrows));
 
 
+def hist_subplot(units_data, unit, tx_times, bin_sec, row, col, axs1, axs2, nrows, ncols):
+    timestamps = units_data[unit]['timestamps']
+
+    num_ts = timestamps.shape[0]
+    bins = get_hist_bins(timestamps, bin_sec)
+    max_tx = max(tx_times.values())
+
+    # plot hist
+    # N is the count in each bin, bins is the lower-limit of the bin
+    counts, bin_edges = np.histogram(timestamps, bins=bins)
+    N, bins, patches = axs1[row, col].hist(bins[:-1], bins=bins, weights=(counts/bin_sec), alpha=0.4)
+
+    # plot rug
+    thin_rug = rug_thinning_factor(num_ts) # improves visualization, make func
+    rug_height = N.min()
+    axs1[row, col].plot(timestamps[::thin_rug], [rug_height]*len(timestamps[::thin_rug]), '|', color='k');
+
+    # plot treatment boundary times
+    y_span = np.linspace(0, N.max(), num=2)
+    
+    for tx, tx_time in tx_times.items():
+        axs1[row, col].plot((tx_time * np.ones(2)), y_span)
+        axs1[row, col].annotate(tx, (tx_time, (N.max()*0.1)), rotation=90)
+
+    plt.xlim(0, max_tx)
+
+    axs1[row, col].set_title('Unit # ' + str(unit)) 
+    if col == 0:
+        axs1[row, col].set_ylabel('Unit Activity (Hz)')
+    if row == (nrows-1):
+        axs1[row, col].set_xlabel('Experiment Time (s)')
 
 
+def plot_hist_grid(units_data, tx_times, bin_sec, num_units):
+    grid_array = make_grid_array(num_units)
+    nrows, ncols = grid_array.shape
 
-def main():
-    from parameter_yaml import set_user
-    from configuration import USER_PATHS, USER, protocol_dir, slice_dir
+    fig, axs1 = plt.subplots(*grid_array.shape, sharex='all', figsize=(ncols*4,nrows*3))
+    axs2 = axs1 
 
-    user = set_user(USER)
-
-    # new def set_paths():
-    # return DATA_DIR, PRODUCT_DIR etc... as paths dict
-    DATA_DIR = USER_PATHS[user]['data_dir']
-    PRODUCT_DIR = USER_PATHS[user]['product_dir']
-
-    data_dir = os.path.join(DATA_DIR, protocol_dir, slice_dir)
-    prod_dir = os.path.join(PRODUCT_DIR, protocol_dir)
-    slice_params_file = 'slice_parameters.yaml'
-    yaml_file = os.path.join(data_dir, slice_params_file)
-
-
-    # it appears that expt_list actually goes unused...!
-    expt_list, tx_filename, unit_filename = find_expt_files(yaml_file)
-
-    # units_mat = scipy.io.loadmat(unit_filename)
-    units_data, tx_times = get_expt_data(unit_filename, tx_filename)
-
-    ## generate first plot
-    UNIT = 0
-    timestamps = units_data[UNIT]['timestamps']
-    bin_sec = 100
-    plot_expt_histo(timestamps, tx_times, bin_sec)
-
-
-    ## generarte cross corr [cell 21]
-    unit_a = 2
-    unit_b = 2
-    # crosscorrs_units[unit_a][unit_b] 
-    crosscorrs_units = crosscorr(units_data[unit_a]['timestamps'],
-                                 units_data[unit_b]['timestamps'])
-
-    print(lag_bins_ms)
-
-
-### ERROR in bar() code. Resume editing here.
-    # plt.bar(lag_bins_ms, crosscorrs_units)
-    # plt.xlabel('lag in ms')
-    # plt.ylabel('correlation');
-    # plt.show()
-
-
-if __name__ == '__main__':
-    SHOW_PLOTS = True
-    main()
+    for row, cols in enumerate(grid_array):
+        for col, unit in enumerate(cols):
+            if not (unit == 0 and col != 0):
+                hist_subplot(units_data, unit, tx_times, bin_sec, row, col, axs1, axs2, nrows, ncols)
+    return fig
