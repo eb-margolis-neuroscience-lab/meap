@@ -8,13 +8,26 @@ USER_PATHS = {'elayne': {'meap': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python
                          'data_dir': r'C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\experiment\\',
                          'product_dir': r'C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\product\\'
                         },
-              'walter': {'meap': r'/Users/walter/Src/meap',
+                'walter': {'meap': r'/Users/walter/Src/meap',
                          'output': r'/Users/walter/Src/meap_yaml_output',
                          'exp_xlsx': r'/Users/walter/Src/meap/parameter_examples/MED64_ExperimentsForAnalysis.xls',
                          'data_dir': r'/Users/walter/Data/med64/experiment/',
                          'product_dir': r'/Users/walter/Data/med64/product/'
+                        }, 
+                'walter_box': {'meap': r'/Users/walter/Src/meap',
+                         'output': r'/Users/walter/Src/meap_yaml_output',
+                         'exp_xlsx': r'/Users/walter/Src/meap/parameter_examples/MED64_ExperimentsForAnalysis.xls',
+                         'data_dir': r'/Users/walter/Library/CloudStorage/Box-Box/MED64_exampledata/structured_analysis_data/experiment/',
+                         'product_dir': r'/Users/walter/Library/CloudStorage/Box-Box/MED64_exampledata/structured_analysis_data/product/'
                         },
+                'walter_data-v0': {'meap': r'/Users/walter/Src/meap',
+                         'output': r'/Users/walter/Src/meap_yaml_output',
+                         'exp_xlsx': r'/Users/walter/Src/meap/parameter_examples/MED64_ExperimentsForAnalysis.xls',
+                         'data_dir': r'/Users/walter/Data/margolis/MED64_exampledata_09-22/',
+                         'product_dir': r'/Users/walter/Data/med64/product/'
+                        }
              }
+## alternative Win path
 # C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap\parameter_examples\MED64 Experiments_cols.xls
 
 USER = 'walter' # 'walter' # 'elayne'
@@ -31,5 +44,10 @@ XL_COLS = ['date', 'cut_by', 'run_by', 'region', 'project',\
 ROW_ID_LIST = ['20200825_12h24m37s', '20200825_13h36m25s'] # LHb
 
 # Analysis Paths
+# for v1 NWB file format
 protocol_dir = r'HB_139_DAMGO'
-slice_dir = r'825_12h24m37s'
+slice_dir = r'825_12h24m37s'  # '20200825_12h24m37s'
+
+# use empty strings for data v0 format
+# protocol_dir = '' #r'HB_139_DAMGO'
+# slice_dir = '' #r'825_12h24m37s'  # '20200825_12h24m37s'
