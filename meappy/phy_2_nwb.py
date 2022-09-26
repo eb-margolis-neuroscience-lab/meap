@@ -102,13 +102,6 @@ def export_units_data(units_data, export_path):
     units_mat = build_units_struct(units_data)
     write_units_data(units_mat, export_path)  # valid , use to validate at end
 
-    
-def write_tx_times(tx_times, tx_filename):
-    """
-    holder function to pass tests
-    """
-    pass
-
 
 def main(phy_dir, med64_bin_path=None, export_filename='export_phy_2_nwb.mat'):
     """
@@ -160,6 +153,3 @@ if __name__ == '__main__':
         main(phy_dir, med64_bin_path=med64_bin_path)
     else:
         main(phy_dir)
-    
-#  python phy_2_nwb.py /Users/walter/Data/phy_elyssa_drive/SN_test_10/20211109_15h09m07s.modat.GUI /Users/walter/Data/latest_modat/20211105_15h48m31s.modat.bin
-
