@@ -22,8 +22,8 @@ class PhyPaths:
         # so probably assigns template to each spike
         # spike template range is from 0 to 152 (the first dimension of template, 
         # so probably unit id)
-        self.spk_template = path.join(phy_dir, 'spike_templates.npy')
-        self.templ_idx = path.join(phy_dir, 'template_ind.npy')
+        # self.spk_template = path.join(phy_dir, 'spike_templates.npy')
+        # self.templ_idx = path.join(phy_dir, 'template_ind.npy')
 
         # matrix of shape (U,I,J) where U appears to be the unit/cluster number, 
         # why are there still 2 more dims for template?
@@ -31,20 +31,16 @@ class PhyPaths:
         # spike duration of 3ms (60 samples = 3ms), 
         # plotted peak is in center
         # J is len 36. could that be some version of electrodes?
-        self.template = path.join(phy_dir, 'templates.npy')
+        # self.template = path.join(phy_dir, 'templates.npy')
         self.spk_clust = path.join(phy_dir, 'spike_clusters.npy')
-        self.clust_group = path.join(phy_dir, 'cluster_group.tsv')
         self.clust_info = path.join(phy_dir, 'cluster_info.tsv')
 
         
 class PhyData:
     def __init__(self, phy_paths):
         self.spike_times = np.load(phy_paths.spike_times)
-        self.spk_template = np.load(phy_paths.spk_template)
-        self.template = np.load(phy_paths.template)
-        self.templ_idx = np.load(phy_paths.templ_idx)
         self.spk_clust = np.load(phy_paths.spk_clust)
-        self.clust_info = pd.read_csv(phy_paths.clust_info, sep='\t')
+        # self.clust_info = pd.read_csv(phy_paths.clust_info, sep='\t')
     
     
 def get_raw_data(med64_bin_path):
