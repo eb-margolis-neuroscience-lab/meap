@@ -45,3 +45,7 @@ __pycache__/
 
 # Mac OS files
 .DS_Store
+
+# meappy development
+*.xls
+

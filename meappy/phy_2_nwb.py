@@ -43,6 +43,14 @@ def build_units_struct(units_data):
     return new_mat
 
 
+def fill_waveforms(phy_2_mat, raw_waves):
+    print(f"appending waveforms to struct {len(phy_2_mat['Unit']['mWave'][0])} {raw_waves.keys()}")
+    u = 68
+    wave = np.mean(raw_waves[u][:], axis=0)
+    print(f'fill_waveforms: {wave.shape}')
+    return phy_2_mat
+    
+
 def _validate(units_mat, condition_str, valid_result, message='Invalid export data structure'):
     if not eval(condition_str) == valid_result:
         raise TypeError(f'{message}: {condition_str} should be {valid_result}')
@@ -115,21 +123,25 @@ def main(phy_dir, med64_bin_path=None, export_filename='export_phy_2_nwb.mat'):
     phy_data = PhyData(phy_paths)
     
     unit_spike_times = get_phy_spikes_list(phy_data.spike_times, phy_data.spk_clust)
-    unit_list = sorted(list(unit_spike_times.keys()))
-
-    signal_clust = phy_data.clust_info['group']!='noise'
-    clust_chan = phy_data.clust_info[signal_clust][['cluster_id', 'ch']].to_numpy()  
-
+    phy_nwb_units = phy_2_nwb(unit_spike_times)
+    phy_2_mat = build_units_struct(phy_nwb_units) 
+    
     if med64_bin_path is not None:
+        unit_list = sorted(list(unit_spike_times.keys()))
+        signal_clust = phy_data.clust_info['group']!='noise'
+        clust_chan = phy_data.clust_info[signal_clust][['cluster_id', 'ch']].to_numpy()  
         matrix_data = get_raw_data(med64_bin_path)
         raw_waves = get_raw_phy_spike_waves(matrix_data, unit_spike_times, 
                                             unit_list=clust_chan, sample_window_width=61)
         print(f'Raw modat datafile contains {type(raw_waves)} type data')
+        phy_2_mat = fill_waveforms(phy_2_mat, raw_waves)
     else:
         print(f'No data file provided for raw modat data. Zeros for waveform output')
-
-    phy_nwb_units = phy_2_nwb(unit_spike_times)
-    phy_2_mat = build_units_struct(phy_nwb_units) 
+    
+    # check waveforms for dev. Delete this print line after dev.
+    temp_unit = 2
+    print(f"peak at waveforms: {phy_2_mat['Unit']['mWave'][0].shape} \n" \
+          f"{phy_2_mat['Unit']['mWave'][0][temp_unit].flatten()}")  
     
     export_filepath = os.path.join(phy_dir, export_filename)    
     export_units_data(phy_nwb_units, export_filepath)
