@@ -13,6 +13,7 @@ import csv
 # constants and unchanged function
 from med64_data import bins_per_sec, lag_bins, lag_bins_ms, read_units_file
 
+# This file has some depricated functions for loading old file types
 # in new Notebook (or new med64_data)
 # from med64_data_v0_diff import find_expt_files as find_expt_files_2021
 # or
@@ -23,12 +24,6 @@ from med64_data import bins_per_sec, lag_bins, lag_bins_ms, read_units_file
 # and then only need:
 # import med64_data_v0_diff as v0
 # and call  v0.get_expt_data  in a couple places in new notebook.
-
-
-# __NEXT__: 
-# - perhaps the export notebook has it's own differences besides file load
-# - make changes to observable to accept the new treatment row names
-# everything else for observable should line up. (check this!!!)
 
 
 def find_expt_files(data_dir):
@@ -97,4 +92,3 @@ def get_expt_data(unit_filename, tx_filename):
     units_data = read_units_file(unit_filename)
     tx_times = read_tx_file(tx_filename)
     return units_data, tx_times
-
