@@ -43,5 +43,5 @@ Activate the anaconda virtual environment for Jupyter notebooks
 Use command line to start __Jupyter Lab__ application in browser window   
 `jupyter lab`
 
-Within the Browswer Application of Jupyter Lab, you can use the left sidebar to navigate to the Jupyter notebook and open it.
+Within the Browser Application of Jupyter Lab, you can use the left sidebar to navigate to the Jupyter notebook and open it.
 Read the [The JupyterLab Interface](https://jupyterlab.readthedocs.io/en/stable/user/interface.html) documents for details.   
