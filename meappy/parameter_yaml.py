@@ -123,6 +123,7 @@ def create_protocol_parms(researchers):
     mkdir_slice()
     with open(protocol_dump_file, 'w', encoding = "utf-8") as yaml_file:
         yaml_file.write(protocol_params_dump)
+    print(protocol_dump_file)
 
 
 def mock_excel():
@@ -163,6 +164,8 @@ def get_researcher_list(ws, col_list):
 
 def get_xl_data(tab_name, row_id_list=None):
     """Fetch and format Excel notebook of experimental data
+    NOTE: the column names for slice_time_col_name (etc) should
+    be moved to constants in configuration.py file
     """
     def values(row):
         return [cell.value for cell in row]
@@ -183,7 +186,7 @@ def get_xl_data(tab_name, row_id_list=None):
         raise IndexError(f'Excel file column names do not match expected\n{list(zip(xl_cols_new, xl_cols))}')
     xl_cols_new = xl_cols_new # change to xl_cols_new if prefered
     date_col_name = xl_cols_new[0]
-    slice_time_col_name = xl_cols_new[8]
+    slice_time_col_name = xl_cols_new[9]
     cut_by_index = xl_cols_new.index('cut_by') 
     run_by_index = xl_cols_new.index('run_by') 
 
