@@ -251,12 +251,8 @@ def plot_hist_grid(units_data, tx_times, bin_sec, num_units):
     return fig
 
 
-
-
-
-
-
 ### plot_autocorr_grid and plot_crosscorr_grid do not appear in notebook
+### These functions up to main() are depricated; not used.
 
 def plot_autocorr_grid(units_data, num_units):
     """

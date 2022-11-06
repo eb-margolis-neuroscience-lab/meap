@@ -27,10 +27,8 @@ USER_PATHS = {'elayne': {'meap': r'C:\Users\fieldslab2\Desktop\Lab\MatLab\Python
                          'product_dir': r'/Users/walter/Data/med64/product/'
                         }
              }
-## alternative Win path
-# C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap\parameter_examples\MED64 Experiments_cols.xls
 
-USER = 'walter' # 'walter' # 'elayne'
+USER = 'walter' #  'elayne'
 
 XL_TAB = 'VTA_EM1_Dose_Response'  #'LHb' # 'VTA_NMDA_Apamin' #'VTA_NMDA' 
 		# 'HbL' # 'HB_139_DAMGO'
