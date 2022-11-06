@@ -111,13 +111,20 @@ def get_source_dict(matrix_data, width_samples, midpoint_sample, active_chan):
     return source_dict
 
 
-def get_phy_spikes_list(phy_spike_data, phy_spk_clust_data):
+def get_phy_spikes_list(phy_spike_data, phy_spk_clust_data, return_seconds=True):
     """
     iterates through list of channel numbers (int)
     must use spike clusters, as the templates are not updated with 
     slices and merging of clusters.
-    Returns as dict.
+    Params
+    samples: default False. Converts the raw PHY output from sample number
+    to time in seconds. Set to True to return the sample number instead.
+    Returns as dict. 
     """
+    if return_seconds:
+        samples_to_seconds = 1 / 20000  # 20kHz sampling rate to sec
+        phy_spike_data = phy_spike_data * samples_to_seconds
+    
     unit_spike_times = dict()
     for time, unit in zip(phy_spike_data, phy_spk_clust_data):
         if unit in unit_spike_times:
