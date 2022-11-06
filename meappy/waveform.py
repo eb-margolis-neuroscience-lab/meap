@@ -40,7 +40,7 @@ class PhyData:
     def __init__(self, phy_paths):
         self.spike_times = np.load(phy_paths.spike_times)
         self.spk_clust = np.load(phy_paths.spk_clust)
-        # self.clust_info = pd.read_csv(phy_paths.clust_info, sep='\t')
+        self.clust_info = pd.read_csv(phy_paths.clust_info, sep='\t')
     
     
 def get_raw_data(med64_bin_path):

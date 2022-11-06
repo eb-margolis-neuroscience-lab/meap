@@ -2,10 +2,14 @@ import os
 import numpy as np
 from scipy.io import savemat
 
-from waveform import (PhyPaths, PhyData, get_raw_data, 
-                      get_phy_spikes_list, get_raw_phy_spike_waves)
+try:
+    from waveform import (PhyPaths, PhyData, get_raw_data, 
+                          get_phy_spikes_list, get_raw_phy_spike_waves)
+except:
+    from .waveform import (PhyPaths, PhyData, get_raw_data, 
+                          get_phy_spikes_list, get_raw_phy_spike_waves)
 
-
+    
 def phy_2_nwb(unit_spike_times):
     """
     create structure of nwb format from the PHY formatted unit spike times.
