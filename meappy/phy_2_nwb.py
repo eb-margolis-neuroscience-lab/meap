@@ -132,7 +132,7 @@ def main(phy_dir, med64_bin_path=None, export_filename='export_phy_2_nwb.mat'):
     
     if med64_bin_path is not None:
         unit_list = sorted(list(unit_spike_times.keys()))
-        signal_clust = phy_data.clust_info['group']!='noise'
+        signal_clust = phy_data.clust_info['group'] == 'good'
         clust_chan = phy_data.clust_info[signal_clust][['cluster_id', 'ch']].to_numpy()  
         matrix_data = get_raw_data(med64_bin_path)
         raw_waves = get_raw_phy_spike_waves(matrix_data, unit_spike_times, 
