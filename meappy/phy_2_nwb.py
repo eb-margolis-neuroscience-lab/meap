@@ -6,10 +6,109 @@ try:
     from waveform import (PhyPaths, PhyData, get_raw_data, 
                           get_phy_spikes_list, get_raw_phy_spike_waves)
 except:
-    from .waveform import (PhyPaths, PhyData, get_raw_data, 
+    from .waveform import (Fs, PhyPaths, PhyData, get_raw_data, 
                           get_phy_spikes_list, get_raw_phy_spike_waves)
 
+def write_int_array_to_tsv(filepath, data_array):
+    """ Writes to a TSV file a two dimensional array as integers
+    serperated by tabs
+    Params:
+        filepath: string, full file path to saved file
+        data_array: np.ndarray, 2D array of integers
+    Returns: None
+    """
+    header = "unit\tchannel"
+    np.savetxt(filepath, data_array, fmt='%i', delimiter="\t", 
+               header=header, comments='')
+    print(f'Data written to {filepath}')
+    return None
     
+    
+def filter_good_clusters(phy_spike_data, phy_spk_clust_data, good_clust_ids, return_seconds=True):
+    """
+    Iterates through list of channel numbers (int)
+    must use spike clusters, as the templates are not updated with 
+    slices and merging of clusters.
+    
+    Params:
+        phy_spike_data: np.ndarray, 1D array of all spikes as sample numbers.
+            PHY spike_times
+        phy_spk_clust_data: np.ndarray, 1d array with same shape as phy_spike_data.
+            Corresponds to cluster ID of each spike in phy_spike_data. PHY spk_clust
+        good_clust_ids: np.ndarray, 1D array of cluster IDs to keep. 
+            PHY clust_info filtered for 'good'.
+        return_seconds: bool, default True. Converts the raw PHY output from sample 
+            number to time in seconds. Set to True to return the sample number instead.
+       
+    Returns:
+        unit_spike_times: dict, keys are cluster number, values are list of spike
+            times in seconds or as sample number (seconds * sampling_rate)
+    """
+    if return_seconds:
+        samples_to_seconds = 1 / Fs  # 20kHz sampling Frequency
+        phy_spike_data = phy_spike_data * samples_to_seconds
+        
+    good_clust_index = np.in1d(phy_spk_clust_data, good_clust_ids)
+    
+    good_spiketimess = phy_spike_data[good_clust_index].reshape(-1, 1)
+    good_clusts = phy_spk_clust_data[good_clust_index].reshape(-1, 1)
+    
+    good_spiketime_clust = np.hstack((good_spiketimess, good_clusts))
+    return good_spiketime_clust
+
+
+def write_float_int_array_to_tsv(filepath, data_array):
+    """ Writes to a TSV file a two dimensional array as floats
+    in first column and tabs in second column. Separated by tabs
+    Params:
+        filepath: string, full file path to saved file
+        data_array: np.ndarray, 2D array with 2 columns of floats and integers
+    Returns: None
+    """
+    header = "timestamp\tunit"
+    np.savetxt(filepath, data_array, fmt='%.9e \t %i', delimiter="\t", 
+               header=header, comments='')
+    print(f'Data written to {filepath}')
+    return None
+
+
+def load_spiketime_clust_arr(filepath, header=True):
+    if header:
+        skip = 1
+    else:
+        skip = 0
+    arr = np.loadtxt(filepath, delimiter="\t", dtype=float, skiprows=skip)
+    spiketimes = arr[:, 0]
+    clusts = arr[:, 1].astype(int)
+    return spiketimes, clusts
+    
+    
+def load_int_arr(filepath, header=True):
+    if header:
+        skip = 1
+    else:
+        skip = 0
+    arr = np.loadtxt(filepath, delimiter="\t", dtype=int, skiprows=skip)
+    return arr
+
+
+def extract_phy_data(phy_dir):
+    phy_paths = PhyPaths(phy_dir)
+    phy_data = PhyData(phy_paths)
+    
+    good_clust = phy_data.clust_info['group'] == 'good'  # not contain !='noise' 'NaN'
+    clust_chan = phy_data.clust_info[good_clust][['cluster_id', 'ch']].to_numpy()  
+    
+    good_clust_ids = clust_chan[:,0]
+    spiketime_clust = filter_good_clusters(phy_data.spike_times, phy_data.spk_clust, 
+                                good_clust_ids, return_seconds=True)
+    return spiketime_clust, clust_chan
+
+
+##############
+## FOR .MAT ##
+##############
+
 def phy_2_nwb(unit_spike_times):
     """
     create structure of nwb format from the PHY formatted unit spike times.
