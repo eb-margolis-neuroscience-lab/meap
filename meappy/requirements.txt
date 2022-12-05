@@ -1,0 +1,9 @@
+pytest
+pre-commit
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+yaml
+xlrd
