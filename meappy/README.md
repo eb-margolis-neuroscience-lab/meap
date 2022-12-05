@@ -10,4 +10,11 @@ a platform for pharmacology analysis of multi-electrode array experiments
 To install 
 
     pip install -e .
+	
+
+## Test
+
+To test
+
+    pytest .
 
