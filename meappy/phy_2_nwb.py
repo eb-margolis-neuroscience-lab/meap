@@ -3,11 +3,14 @@ import numpy as np
 from scipy.io import savemat
 
 try:
-    from waveform import (PhyPaths, PhyData, get_raw_data, 
+    from waveform import (Fs, PhyPaths, PhyData, get_raw_data, 
                           get_phy_spikes_list, get_raw_phy_spike_waves)
 except:
-    from .waveform import (Fs, PhyPaths, PhyData, get_raw_data, 
-                          get_phy_spikes_list, get_raw_phy_spike_waves)
+    waveform_dir = '.waveform'  # relative module path for ipynb import
+    waveform_import_str = (f'from {waveform_dir} import (Fs, PhyPaths, PhyData, ' + \
+                           f'get_raw_data, get_phy_spikes_list, get_raw_phy_spike_waves)')
+    exec(waveform_import_str)
+
 
 def write_int_array_to_tsv(filepath, data_array):
     """ Writes to a TSV file a two dimensional array as integers
@@ -105,166 +108,60 @@ def extract_phy_data(phy_dir):
     return spiketime_clust, clust_chan
 
 
-##############
-## FOR .MAT ##
-##############
-
-def phy_2_nwb(unit_spike_times):
+def main(phy_dir, med64_bin_path=None, export_path=None):
     """
-    create structure of nwb format from the PHY formatted unit spike times.
-    waveform currently has a placeholder of all zeros in correct ndarray size
+    Using data transformed from PHY to TSV tab seperated values formatted data.
+    Takes one, two or three positional arguments.
+    Params:
+        phy_dir: str, The directory path of the PHY formatted spike sorter output
+        med64_bin_path: str, Path with filename of raw med64 modat data
+        export_filename: str, filename used to export to tsv files into phy_dir
     """
-    nwb = dict()
-    for u in unit_spike_times.keys():
-        nwb[u] = dict([('timestamps', np.array(unit_spike_times[u])), 
-                       ('waveform', np.zeros((60,1)))])
-    return nwb
-
-
-def build_units_struct(units_data):
-    """
-    build matlab style data structure from a unit_data dict
-    """
-    num_units = len(units_data)
-    units = sorted(units_data.keys())
-    
-    dt = np.dtype([('ts', object), ('mWave', object)])
-
-    ts_obj = units_data[units[0]]['timestamps'].astype(np.float64)[np.newaxis, :]
-    mw_obj = units_data[units[0]]['waveform'] 
-    x = np.array([(ts_obj, mw_obj)], 
-                 dtype=dt)
-
-    for u in units[1:]:
-        ts_obj = units_data[u]['timestamps'][np.newaxis, :]
-        mw_obj = units_data[u]['waveform'] 
-        x2 = np.array([(ts_obj, mw_obj)], 
-                     dtype=dt)
-        x = np.concatenate((x, x2))
-
-    new_mat = dict([('Unit', x[np.newaxis, :])])
-    return new_mat
-
-
-def fill_waveforms(phy_2_mat, raw_waves):
-    print(f"appending waveforms to struct {len(phy_2_mat['Unit']['mWave'][0])} {raw_waves.keys()}")
-    u = 68
-    wave = np.mean(raw_waves[u][:], axis=0)
-    print(f'fill_waveforms: {wave.shape}')
-    return phy_2_mat
-    
-
-def _validate(units_mat, condition_str, valid_result, message='Invalid export data structure'):
-    if not eval(condition_str) == valid_result:
-        raise TypeError(f'{message}: {condition_str} should be {valid_result}')
-    else:
-        return True
-
-    
-def validate_units_data(units_mat, header=False):
-    if header:
-        _validate(units_mat, "list(units_mat.keys())", 
-                  ['__header__', '__version__', '__globals__', 'Unit'])
-        if not b'MATLAB 5.0 MAT-file' in units_mat['__header__']:
-            raise TypeError(f'Invalid export data structure: header error')
-    _validate(units_mat, "units_mat['Unit'].dtype", 
-              [('ts', 'O'), ('mWave', 'O')])
-    _validate(units_mat, "type(units_mat['Unit'])", np.ndarray)
-    _validate(units_mat, "type(units_mat['Unit']['ts'])", np.ndarray)
-    _validate(units_mat, "type(units_mat['Unit']['mWave'])", np.ndarray)
-    _validate(units_mat, "units_mat['Unit']['ts'].dtype", object)
-    _validate(units_mat, "units_mat['Unit']['mWave'].dtype", object)
-    _validate(units_mat, "len(units_mat['Unit']['ts'].shape)", 2)
-    _validate(units_mat, "len(units_mat['Unit']['mWave'].shape)", 2)
-    _validate(units_mat, "units_mat['Unit']['ts'].shape[0]", 1)
-    _validate(units_mat, "units_mat['Unit']['mWave'].shape[0]" ,1)
-    _validate(units_mat, "units_mat['Unit']['mWave'].shape[0]", 1) # add extra dimension here
-    _validate(units_mat, "units_mat['Unit']['ts'][0].dtype", object)
-    _validate(units_mat, "units_mat['Unit']['mWave'][0].dtype", object)
-    _validate(units_mat, "type(units_mat['Unit']['ts'][0])", np.ndarray)
-    _validate(units_mat, "type(units_mat['Unit']['ts'][0][0])", np.ndarray)
-    _validate(units_mat, "type(units_mat['Unit']['ts'][0][0][0])", np.ndarray)
-    _validate(units_mat, "type(units_mat['Unit']['mWave'][0])", np.ndarray)
-    _validate(units_mat, "type(units_mat['Unit']['mWave'][0][0])", np.ndarray)
-    _validate(units_mat, "units_mat['Unit']['ts'][0][0].shape[0]", 1)
-    _validate(units_mat, "units_mat['Unit']['mWave'][0][0].shape", (60, 1))
-    _validate(units_mat, "units_mat['Unit']['ts'][0][0].dtype", np.float64)
-    _validate(units_mat, "units_mat['Unit']['ts'][0][0][0].dtype", np.float64)
-    _validate(units_mat, "units_mat['Unit']['mWave'][0][0].dtype", np.float64)
-    return 'valid'
-
-
-def write_units_data(units_mat, export_path):
-    """
-    mdict is units_data to export matlab tile
-    export_path is the unit_filename to write the data to
-    """    
-    if validate_units_data(units_mat) == 'valid':
-        savemat(export_path, units_mat)
-        print(f"Valid data structure. Wrote file: {export_path}")
-    else:
-        print("Invalid data structure. File not written")
-    return None
-    
-    
-def export_units_data(units_data, export_path):
-    # write_units_data(units_data, unit_filename)  # not valid
-    data_key = 'Unit'
-    units_mat = build_units_struct(units_data)
-    write_units_data(units_mat, export_path)  # valid , use to validate at end
-
-
-def main(phy_dir, med64_bin_path=None, export_filename='export_phy_2_nwb.mat'):
-    """
-    Using data transformed from PHY to NWB (EasySort) formatted data.
-    Takes one, two or three positional arguments. 
-    phy_dir : The directory path of the PHY formatted spike sorter output
-    med64_bin_path : Path with filename of raw med64 modat data
-    export_filename : filename used to export to NWB.mat file into phy_dir
-    """
+    # set filepaths
+    print(f'PHY data directory name is \n\t{phy_dir}')
     phy_paths = PhyPaths(phy_dir)
     phy_data = PhyData(phy_paths)
     
-    unit_spike_times = get_phy_spikes_list(phy_data.spike_times, phy_data.spk_clust)
-    phy_nwb_units = phy_2_nwb(unit_spike_times)
-    phy_2_mat = build_units_struct(phy_nwb_units) 
-    
     if med64_bin_path is not None:
-        unit_list = sorted(list(unit_spike_times.keys()))
-        signal_clust = phy_data.clust_info['group'] == 'good'
-        clust_chan = phy_data.clust_info[signal_clust][['cluster_id', 'ch']].to_numpy()  
-        matrix_data = get_raw_data(med64_bin_path)
-        raw_waves = get_raw_phy_spike_waves(matrix_data, unit_spike_times, 
-                                            unit_list=clust_chan, sample_window_width=61)
-        print(f'Raw modat datafile contains {type(raw_waves)} type data')
-        phy_2_mat = fill_waveforms(phy_2_mat, raw_waves)
-    else:
-        print(f'No data file provided for raw modat data. Zeros for waveform output')
+        print("Waveform export not yet implimented for TSV format")
     
-    # check waveforms for dev. Delete this print line after dev.
-    temp_unit = 2
-    print(f"peak at waveforms: {phy_2_mat['Unit']['mWave'][0].shape} \n" \
-          f"{phy_2_mat['Unit']['mWave'][0][temp_unit].flatten()}")  
+    if export_path is None:
+        export_path = phy_dir
+    print(f'Files exported to directory: \n\t{export_path}')
+        
+    # get and format data
+    spiketime_clust, clust_chan = extract_phy_data(phy_dir)
+
+    # write array  unit_electrode units_ts
+    clust_chan_filepath = os.path.join(export_path, "unit_electrode.tsv")
+    spiketime_clust_filepath = os.path.join(export_path, "units_ts.tsv")
     
-    export_filepath = os.path.join(phy_dir, export_filename)    
-    export_units_data(phy_nwb_units, export_filepath)
-    
+    write_int_array_to_tsv(clust_chan_filepath, clust_chan)
+    write_float_int_array_to_tsv(spiketime_clust_filepath, spiketime_clust)
+
     
 if __name__ == '__main__':
     """
     Conversion code for PHY files to NWB file formats
     This script reads in a PHY formatted data directory of spike sorter output. 
     usage: in command line type 'python phy_2_nwb.py <phy_data_directory>' 
+    Params:
+        Arg 1: str, PHY data directory path
+        Arg 2: str, optional, Raw modat.bin data file path
+        Arg 3: str, optional, Export file path. Default is PHY dir path
+    
     """
     import sys, argparse
     
     if len(sys.argv) < 2:
-        raise ValueError('Please provide PHY data directory.')
+        raise ValueError('Missing PHY data directory path required first parameter')
     phy_dir = sys.argv[1]
-    print(f'PHY data directory name is \n\t{phy_dir}')
     if len(sys.argv) >= 3:
         med64_bin_path = sys.argv[2]
-        print(f'Raw modat data filename is \n\t{med64_bin_path}')
+    if len(sys.argv) == 3:
         main(phy_dir, med64_bin_path=med64_bin_path)
+    if len(sys.argv) >= 4:
+        export_path = sys.argv[3]
+        main(phy_dir, med64_bin_path=med64_bin_path, export_path=export_path)
     else:
         main(phy_dir)
