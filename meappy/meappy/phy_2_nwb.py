@@ -149,10 +149,9 @@ if __name__ == '__main__':
         Arg 1: str, PHY data directory path
         Arg 2: str, optional, Raw modat.bin data file path
         Arg 3: str, optional, Export file path. Default is PHY dir path
-    
     """
     import sys, argparse
-    
+
     if len(sys.argv) < 2:
         raise ValueError('Missing PHY data directory path required first parameter')
     phy_dir = sys.argv[1]
