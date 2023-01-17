@@ -54,7 +54,7 @@ __pycache__/
 # meappy development
 *.xls
 _dev/
-
+temp_test_data/
 
 # Distribution / packaging
 .Python

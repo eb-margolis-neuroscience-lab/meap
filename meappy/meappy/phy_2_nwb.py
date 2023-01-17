@@ -1,4 +1,4 @@
-import os
+import os, shutil, csv
 import numpy as np
 from scipy.io import savemat
 
@@ -10,7 +10,7 @@ except:
     waveform_import_str = (f'from {waveform_dir} import (Fs, PhyPaths, PhyData, ' + \
                            f'get_raw_data, get_phy_spikes_list, get_raw_phy_spike_waves)')
     exec(waveform_import_str)
-
+        
 
 def write_int_array_to_tsv(filepath, data_array):
     """ Writes to a TSV file a two dimensional array as integers
@@ -76,6 +76,9 @@ def write_float_int_array_to_tsv(filepath, data_array):
 
 
 def load_spiketime_clust_arr(filepath, header=True):
+    """
+    Loads tsv file with spiketimes. outputs an ndarray.
+    """
     if header:
         skip = 1
     else:
@@ -93,6 +96,19 @@ def load_int_arr(filepath, header=True):
         skip = 0
     arr = np.loadtxt(filepath, delimiter="\t", dtype=int, skiprows=skip)
     return arr
+
+
+def read_tx_file(tx_filename):
+    """
+    Returns: dict of treatement label string as key and 
+    float of beginning timestamp as value.
+    """
+    tx_times = dict()
+    with open(tx_filename) as csvDataFile:
+        csvReader = csv.DictReader(csvDataFile)
+        for row in csvReader:
+            tx_times[row["label"]] = float(row["begin"])
+    return tx_times
 
 
 def extract_phy_data(phy_dir):
