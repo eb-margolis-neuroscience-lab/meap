@@ -3,11 +3,23 @@ import os, shutil
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 _TEMP_DIR = 'temp_test_data'
-
+_README_DESCRIPTION = """# MEAP Temporary Test Data   
+This directory is generated from data in the meappy/data directory using
+code in phy_2_nwb.py. See the notebook "meap/notebooks/compare_phy_nwb.ipynb"
+for details.
+"""
+    
     
 def get_example_data_path(path):
     return os.path.join(_ROOT, 'data', path)
-
+    
+    
+def write_readme(path, text):
+    file_path = os.path.join(path, "readme.txt")
+    text_file = open(file_path, "w")
+    text_file.write(text)
+    text_file.close()
+    
     
 def get_test_data_path(root=_ROOT, temp_dir=_TEMP_DIR):
     """
@@ -20,7 +32,8 @@ def get_test_data_path(root=_ROOT, temp_dir=_TEMP_DIR):
         return path_temp_data
     else:
         try:
-            temp_dir = os.mkdir(path_temp_data)
+            os.mkdir(path_temp_data)
+            write_readme(path_temp_data, _README_DESCRIPTION)
             return path_temp_data
         except:
             print(f'Error creating directory {path_temp_data}')

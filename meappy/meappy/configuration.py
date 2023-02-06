@@ -1,8 +1,33 @@
 # configuration.py
 
+from os import path
+from pathlib import Path
+
+
+meappy_path = Path( __file__ ).parent.absolute()
+meap_path = meappy_path.parent.parent.absolute()
+base_path = meap_path.parent.absolute()
+params_path = path.join(meap_path, 'parameter_examples')
+
+_HOME = Path.home()
+# examples of home paths for Windows and Mac OS:
+# C:\Users\\fieldslab2\
+# /Users/walter
+
+box_base_path = path.join(_HOME ,'/Library/CloudStorage/Box-Box')
+box_output_path = path.join(box_base_path, 'meap_output')
+
+expt_xl_file = 'MED64_ExperimentsForAnalysis.xls'
+
 # These configuration files can be set up for each computer
 # use python dataclasses
 USER_PATHS = {
+    "meappy_data": {
+        "base": base_path,
+        "meap": meap_path,
+        "output": path.join(base_path, 'meap_output'),
+        "exp_xlsx": path.join(params_path, expt_xl_file), 
+    },
     "elayne": {
         "meap": r"C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap",
         "output": r"C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap_yaml_output",
@@ -11,29 +36,29 @@ USER_PATHS = {
         "product_dir": r"C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\product\\",
     },
     "walter": {
-        "meap": r"/Users/walter/Src/meap",
-        "output": r"/Users/walter/Src/meap_yaml_output",
-        "exp_xlsx": r"/Users/walter/Src/meap/parameter_examples/MED64_ExperimentsForAnalysis.xls",
-        "data_dir": r"/Users/walter/Data/med64/experiment/",
-        "product_dir": r"/Users/walter/Data/med64/product/",
+        "base": base_path,
+        "meap": meap_path,
+        "output": path.join(base_path, 'meap_output'),
+        "exp_xlsx": path.join(params_path, expt_xl_file),
+        # "data_dir": r"/Users/walter/Data/med64/experiment/",
+        # "product_dir": r"/Users/walter/Data/med64/product/",
     },
     "walter_box": {
-        "meap": r"/Users/walter/Src/meap",
-        "output": r"/Users/walter/Src/meap_yaml_output",
-        "exp_xlsx": r"/Users/walter/Src/meap/parameter_examples/MED64_ExperimentsForAnalysis.xls",
-        "data_dir": r"/Users/walter/Library/CloudStorage/Box-Box/MED64_exampledata/structured_analysis_data/experiment/",
-        "product_dir": r"/Users/walter/Library/CloudStorage/Box-Box/MED64_exampledata/structured_analysis_data/product/",
+        "box": box_base_path,
+        "meap": meap_path,
+        "output":box_output_path,
+        "exp_xlsx": path.join(params_path, expt_xl_file),
     },
     "walter_data-v0": {
         "meap": r"/Users/walter/Src/meap",
         "output": r"/Users/walter/Src/meap_yaml_output",
         "exp_xlsx": r"/Users/walter/Src/meap/parameter_examples/MED64_ExperimentsForAnalysis.xls",
-        "data_dir": r"/Users/walter/Data/margolis/MED64_exampledata_09-22/",
-        "product_dir": r"/Users/walter/Data/med64/product/",
+        # "data_dir": r"/Users/walter/Data/margolis/MED64_exampledata_09-22/",
+        # "product_dir": r"/Users/walter/Data/med64/product/",
     },
 }
 
-USER = "walter"  #  'elayne'
+USER = "meappy_data"  #"walter"  #  'elayne'  # walter_box
 
 XL_TAB = "VTA_EM1_Dose_Response"  #'LHb' # 'VTA_NMDA_Apamin' #'VTA_NMDA'
 # 'HbL' # 'HB_139_DAMGO'

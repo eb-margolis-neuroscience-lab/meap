@@ -14,15 +14,14 @@ protocol_metadata:
         the experiment.xls file.]
 
         This description is in quotes, therefore YAML can read it as a single 
-        long block of 
-         wrapped text, even though it is multiple lines in YAML file. 
+        long block of wrapped text, even though it is multiple lines in YAML file. 
 
-         Adding an extra blank line inside the same block text quote will be 
-         read by YAML as a new line.
+        Adding an extra blank line inside the same block text quote will be 
+        read by YAML as a new line.
 
-         Attempting to add lists, or other complex grammatical structures into 
-         this kind of text block will sometimes be less readable than creating 
-         an actual structured list as data in YAML'
+        Attempting to add lists, or other complex grammatical structures into 
+        this kind of text block will sometimes be less readable than creating 
+        an actual structured list as data in YAML'
 
 spike_sorting:
    method: matlab ez-spike

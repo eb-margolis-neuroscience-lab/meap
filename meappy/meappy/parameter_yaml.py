@@ -5,7 +5,10 @@ from datetime import datetime
 import xlrd
 import pathlib
 
-from configuration import USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST
+from meappy.configuration import USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST
+from meappy.meappy_data import get_test_data_path
+
+
 
 ## ipywidget display settings for jupyter lab notebook
 # import ipywidgets as widgets
@@ -108,8 +111,10 @@ def create_slice_params(xl):
         / r"slice_parameters.yaml"
     )
     mkdir_slice(slice_params["paths"]["slice"])
+
     with open(slice_dump_filepath, "w", encoding="utf-8") as yaml_file:
         yaml_file.write(slice_params_dump)
+        print(f"Parameter slice params written to: {slice_dump_filepath}")
 
 
 def create_protocol_parms(researchers):
@@ -125,7 +130,7 @@ def create_protocol_parms(researchers):
     mkdir_slice()
     with open(protocol_dump_file, "w", encoding="utf-8") as yaml_file:
         yaml_file.write(protocol_params_dump)
-    print(protocol_dump_file)
+    print(f"Parameter protocol written to: {protocol_dump_file}")
 
 
 def mock_excel():
@@ -239,12 +244,13 @@ def main():
     `xl = mock_excel()`
     """
     user = set_user(USER)
-    print(USER_PATHS[user]["protocol_output"])
+    print(f"set user to: {user}")
 
     xl, researchers = get_xl_data(XL_TAB, ROW_ID_LIST)
     for row_id in ROW_ID_LIST:
-        create_slice_params(xl[row_id])
-    create_protocol_parms(researchers)
+        created_slice_params_location = create_slice_params(xl[row_id])
+    created_protocol_params_location = create_protocol_parms(researchers)
+    
 
 
 if __name__ == "__main__":
