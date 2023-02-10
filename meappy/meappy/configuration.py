@@ -14,7 +14,9 @@ _HOME = Path.home()
 # C:\Users\\fieldslab2\
 # /Users/walter
 
-box_base_path = path.join(_HOME ,'/Library/CloudStorage/Box-Box')
+data_base_path = path.join(_HOME, 'Data')
+        # /med64/experiment/VTA_NMDA/20211005_17h33m55s
+box_base_path = path.join(_HOME, '/Library/CloudStorage/Box-Box')
 box_output_path = path.join(box_base_path, 'meap_output')
 
 expt_xl_file = 'MED64_ExperimentsForAnalysis.xls'
@@ -27,6 +29,8 @@ USER_PATHS = {
         "meap": meap_path,
         "output": path.join(base_path, 'meap_output'),
         "exp_xlsx": path.join(params_path, expt_xl_file), 
+        "params_template": params_path,
+        "data_dir": path.join(data_base_path, 'med64/experiment/VTA_NMDA/20211005_17h33m55s'),
     },
     "elayne": {
         "meap": r"C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap",
@@ -121,3 +125,12 @@ slice_dir = r"825_12h24m37s"  # '20200825_12h24m37s'
 # use empty strings for data v0 format
 # protocol_dir = '' #r'HB_139_DAMGO'
 # slice_dir = '' #r'825_12h24m37s'  # '20200825_12h24m37s'
+
+
+## QQ configurations
+# what do I need the params for?
+# old: /Users/walter/Data/med64/experiment/VTA_NMDA/20211005_17h33m55s
+
+############
+# NEXT.... #
+############
