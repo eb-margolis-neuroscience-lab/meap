@@ -52,7 +52,7 @@ __pycache__/
 .DS_Store
 
 # meappy development
-*.xls
+# *.xls
 _dev/
 temp_test_data/
 
