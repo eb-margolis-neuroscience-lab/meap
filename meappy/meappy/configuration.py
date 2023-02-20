@@ -31,6 +31,7 @@ USER_PATHS = {
         "exp_xlsx": path.join(params_path, expt_xl_file), 
         "params_template": params_path,
         "data_dir": path.join(data_base_path, 'med64/experiment/VTA_NMDA/20211005_17h33m55s'),
+        "phy_export": path.join(data_base_path, 'meap/experiment'),
     },
     "elayne": {
         "meap": r"C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap",
