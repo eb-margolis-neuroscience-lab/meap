@@ -6,9 +6,13 @@
 .ONESHELL:
 
 build:
-	pushd meapr
 	Rscript -e "devtools::document()"
   Rscript -e "devtools::build()"
 
 install:
   Rscript -e "devtools::install_local('.', force = TRUE)"
+  
+all: install
+
+
+.PHONY: all build install

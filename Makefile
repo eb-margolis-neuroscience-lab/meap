@@ -13,3 +13,4 @@ install_meapr:
 
 
 
+.PHONY: build_meapr install_meapr
