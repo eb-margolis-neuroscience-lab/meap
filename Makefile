@@ -19,6 +19,6 @@ install_meappy:
 	$(MAKE) -C meappy install
 
 
-all: install_meapr
+all: install_meapr install_meappy
 
 .PHONY: all build_meapr install_meapr
