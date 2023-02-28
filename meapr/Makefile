@@ -10,7 +10,7 @@ build:
   Rscript -e "devtools::build()"
 
 install:
-  Rscript -e "devtools::install_local('.', force = TRUE)"
+	Rscript -e "devtools::install_local('.', force = TRUE)"
   
 all: install
 

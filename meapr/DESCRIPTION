@@ -3,13 +3,19 @@ Type: Package
 Version: 0.0.0.9000
 Title: Multi-Electrode Array Pharmacology
 Description: MED64 elecrophysiology data for pharamcology.
-Authors@R: 
-   c(person(given="Matthew", family="O'Meara", email = "maom@umich.edu",
-    role = c("aut", "cre"))),
-     person(given = "Madeline", family = "Martin", email = "mamadeli@umich,edu",
-     role = "aut")
+Authors@R: c(
+  person(
+    given = "Matthew",
+    family = "O'Meara",
+    email = "maom@umich.edu",
+    role = c("aut", "cre")),
+  person(
+    given = "Madeline",
+    family = "Martin",
+    email = "mmarti29@uoregon.edu",
+    role = c("aut")))
 Depends: 
-    R (>= 3.6.0),
+    R (>= 4.0.0),
     Rcpp
 Imports: 
     assertthat,
@@ -47,7 +53,7 @@ Collage: 'load_firing_data.R'
     'clean_normalize_label_data.R'
     'filter_treatment_add_log_dose.R'
     'plot_responsive_Hz.R'
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 Suggests: knitr,
     rmarkdown
