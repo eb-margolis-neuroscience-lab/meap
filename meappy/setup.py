@@ -2,6 +2,14 @@ from gettext import install
 from setuptools import setup
 import os
 
+lib_folder = os.path.dirname(os.path.realpath(__file__))
+requirement_path = lib_folder + '/requirements.txt'
+install_requires = []
+if os.path.isfile(requirement_path):
+    with open(requirement_path) as f:
+        install_requires = f.read().splitlines()
+
+
 exec(open("meappy/version.py").read())
 
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -18,6 +26,7 @@ setup(
     url="https://github.com/eb-margolis-neuroscience-lab/meap",
     license="MIT",
     packages=["meappy"],
+    install_requires = install_requires,
     package_data={'meappy': ['data//20211109_15h09m07s_test/unit_electrode.tsv', 
                              'data/20211109_15h09m07s_test/units_ts.ts']},
     data_files=[('my_data', ['data//20211109_15h09m07s_test/unit_electrode.tsv', 
