@@ -5,6 +5,8 @@ from scipy.io import savemat
 try:
     from waveform import (Fs, PhyPaths, PhyData, get_raw_data, 
                           get_phy_spikes_list, get_raw_phy_spike_waves)
+    from meappy.configuration import USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST
+
 except:
     waveform_dir = '.waveform'  # relative module path for ipynb import
     waveform_import_str = (f'from {waveform_dir} import (Fs, PhyPaths, PhyData, ' + \
@@ -142,7 +144,7 @@ def main(phy_dir, med64_bin_path=None, export_path=None):
         print("Waveform export not yet implimented for TSV format")
     
     if export_path is None:
-        export_path = phy_dir
+        export_path = phy_data
     print(f'Files exported to directory: \n\t{export_path}')
         
     # get and format data
@@ -168,6 +170,9 @@ if __name__ == '__main__':
     """
     import sys, argparse
 
+    user_paths = USER_PATHS[USER]
+    export_path = user_paths['phy_export']
+    
     if len(sys.argv) < 2:
         raise ValueError('Missing PHY data directory path required first parameter')
     phy_dir = sys.argv[1]
@@ -179,4 +184,4 @@ if __name__ == '__main__':
         export_path = sys.argv[3]
         main(phy_dir, med64_bin_path=med64_bin_path, export_path=export_path)
     else:
-        main(phy_dir)
+        main(phy_dir, export_path=export_path)
