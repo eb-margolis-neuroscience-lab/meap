@@ -33,6 +33,4 @@ __meappy/__ <- python package
       process_           
 
    6) Manually copy exported files into experiment folders
-            
-           
       
