@@ -1,0 +1,874 @@
+---
+title: "Observable Crossfilter Plots"
+format:
+  html:
+    code-fold: true
+jupyter: python3
+execute:
+  echo: false
+---
+
+### Quarto Notebook, updated 2023-03-01
+<!-- comment on above: the quarto doc will render markdown, but most of this document is rendering markdown via ojs observable cells to more closely copy the online notebook. -->
+
+
+```{ojs}
+//| echo: false
+md`Interactive Crossfilter Cumulative Firing Rate & Parallel Plots 2023 data 
+[version 1.1b full code]`
+```
+
+
+```{ojs}
+md`
+### Introduction
+__Experimental Aim__   
+The goal of this experiment is to improve the safety and efficacy of opioids for pain management. The interactive plots are a visualization of the activity of dozens of neurons recorded simultaneously in the Lateral Habenula nucleus. The Lateral Habenula is involved in the unpleasant (aversive) quality of pain. These experiments record the effect of different drug treatments on Lateral Habenula neurons.
+
+__Raw Data__     
+The raw data is collected using an array of 64 electrodes to record many neurons simultaneously.  The neurons are in largely intact brain tissue within a micro-thin slice of brain only a couple neurons thick. The electrical signals are processed into the activity level of individual neurons. Data is pre-processed to create summarized and comparable metrics.  
+
+__Interactive Cross-filtering Plots:__   
+This Observable notebook creates linked plots that allow for complex interactive cross-filtering of multi-neuronal data. The data in each of the six plots here are intimately related. Line color represents the same single neuron in each plot. Brushing (clicking the mouse and sliding) across colored lines in any plot will highlight that line/neuron in all plots and mute the un-brushed lines.   
+`
+```
+
+
+```{ojs}
+md`### Interpreting Plot Elements   
+The _"Treatment X"_ plots represent different sequential drug application treatments during the same experiment. For a single cell, we can see that the average firing rate changes in each treatment epoch in the _"Firing Rate"_ plot.
+In the example diagrams, spike rasters of the neuron are shown at the bottom of each plot to clarify how the neuron's activity relates to the line of cumulative spike activity. In the interactive cross filtering plots, only the cumulative activity line for each neuron is shown.  
+`
+```
+
+```{ojs}
+img = html`<img src="https://github.com/walt-r/med64-d3/blob/main/med64-d3-diagram_treatments.png?raw=true", width=60%/>`
+```
+
+```{ojs}
+md`
+__Example Cumulative Activity Plots__
+* Firing rate independent: A diagonal line indicates steady neuron activity. For example Treatments A and B show no change in firing rate after exposure to drug. Both appear as a diagonal line.
+* Spatially seperate changes by direction, degree and onset.
+  * Concave Downward deflection (Treatment C) indicates a _decrease_ in firing rate after start of treatment  
+  * Concave upward deflection (Treatment D) indicates an _increase_ in firing rate after start of treatment  
+`
+```
+
+```{ojs}
+md`### Spatially seperate changes by direction, degree and onset.
+In addition to indicating the direction of change in activity, the plots spatially seperate by degree of change and time of change. This is illustrated with two units, orange and blue, and their corresponding spike rasters at the bottom.
+* Sharpness of curve indicates degree of change (figure "Degree of Change")
+* Time of curve indicated onset of change (figure "Time of Change"). Notice the lines cross in between the two temporally seperated time of change onset for each neuron.
+`
+```
+
+```{ojs}
+
+img2 = html`<img src="https://github.com/walt-r/med64-d3/blob/main/med64-d3-diagram_change_time_degree.png?raw=true", width=40%/>`
+```
+
+```{ojs}
+md`
+### Interactive Visualization Elements   
+*Legend Unit Number and Line Color*: Each neuron ("unit") is designated by a color. Below the plot is a table that lists selected units and descriptive information.
+
+The *Data File* drop down menu will load data from a new brain slice. 
+
+The 5 top and left most plots show 5 periods of the experiment:
+- *Baseline*: 10 minutes of no treatment
+- *AMPA blocker DNQX*. This blocks glutamate signalling between neurons in preparation. This blocks activity in one neuron from directly exciting neurons on other channels. Subsequent treatments are also in the presence of DNQX
+- *BT139 ON*: experimental treatment applied
+- *BT139 OFF*: experimental treatment washed off
+- *DAMGO ON*: mu-opioid agonist applied
+
+The *lower right plot* can be thought of as a summary plot of the first 5 and connects them in one image.  It shows the mean firing rate of each neuron (unit) across the different sequential experimental periods.
+`
+```
+
+```{ojs}
+md`-----    
+##### Legend Unit Number and Line Color`
+```
+
+
+```{ojs}
+swatches({color: z})
+```
+
+```{ojs}
+viewof fileSelection = {
+  const files = new Map(fileAttachArray.map(f => [f.name, f]));
+  
+  const form = select({
+    title: "Data File",
+    description: "Select a data file",
+    options: Array.from(files.keys()),
+    value: fileAttachArray[0]  //"qq_for_d3_10K_825_13h36m25s.csv"
+  });
+ 
+  return Object.defineProperty(html`<div>${form}`, 'value', {get() { return files.get(form.value) }});
+}
+```
+
+
+
+```{ojs}
+viewof selection = {
+  const svg = d3.create("svg")
+      .attr("viewBox", [-padding, 0, width, height]);
+
+  svg.append("style")
+      .text(`circle.hidden { fill: #000; fill-opacity: 1; r: ${point_radius.hidden}px; }`);
+  
+  svg.append("style")
+      .text(`path.hidden { fill: none; stroke: steelblue; stroke-width: ${path_width.hidden}; }`);
+  
+  svg.append("g")
+      .call(xAxis);
+
+  svg.append("g")
+      .call(yAxis);
+
+// New i, j are the x, y coords of cells in display.
+// Coordinate pair is created by d3.cross passed to .data()
+  const cell = svg.append("g")
+    .selectAll("g")
+    .data(d3.cross(d3.range(panel_cols), d3.range(panel_rows)))
+    .join("g")
+      .attr("transform", ([i, j]) => `translate(${i * size},${j * size})`);
+
+  cell.append("rect")
+      .attr("fill", "none")
+      .attr("stroke", "#aaa")
+      .attr("x", padding / 2 + 0.5)
+      .attr("y", padding / 2 + 0.5)
+      .attr("width", size - padding)
+      .attr("height", size - padding);
+
+  
+// These i, j are the cell panel locations. To see how are they determined? add `.attr("r", j*5);`
+// i = 0,1,2 for each col in image
+// j = 0, 1 for each row in image
+  cell.each(function([i, j]) {
+    d3.select(this).selectAll("circle")
+      .data(data_points.filter(d => !isNaN(d[tx_panel_array[j][i]]) && !isNaN(d[column_pointx[0]])))
+      .join("circle")
+        .attr("cx", d => x[cellI(i, j)](d[column_pointx[cellI(i, j)]])) 
+        // hard to understand indexing of y[](). rewrite for clarity.
+        .attr("cy", d => y[cellI(i, j)](d[tx_panel_array[j][i]]))
+  });
+
+  const circle = cell.selectAll("circle")
+      .attr("r", point_radius.visible)
+      .attr("fill-opacity", point_radius.opacity_v)
+      .attr("fill", d => z(d.unit));
+
+// Label cells with column names
+  svg.append("g")
+      .style("font", "bold 10px sans-serif")
+      .style("pointer-events", "none")
+    .selectAll("text")
+    .data(tx_panel_array.flat()) // tx_panel_array //  columns
+    .join("text")
+      .attr("transform", (d, i) => `translate(${cellXY(i)[1] * size},${cellXY(i)[0] * size})`)
+      .attr("x", padding)
+      .attr("y", padding)
+      .attr("dy", ".71em")
+      .text((d, i, j) => d);
+
+  
+// next three blocks add paths. 
+  const cell_paths = svg.append("g")
+    .selectAll("g")
+    .data(d3.cross(d3.range(panel_cols), d3.range(panel_rows)))
+    // .data(d3.cross(d3.range(columns_points.length), d3.range(1)))  // tx_panel_array[j][i]
+    .join("g")
+      .attr("transform", ([i, j]) => `translate(${i * size},${j * size})`);
+  
+  cell_paths.each(function([i, j]) {
+    d3.select(this).selectAll("path")
+      // .data(Object.values(data_paths_qq[columns_points[i]].series))  
+      .data(Object.values(data_paths[tx_panel_array[j][i]].series))  
+      .join("path")
+        .style("mix-blend-mode", "hard-light") // hard-light // normal // multiply
+        .attr("d", d => line(d.coords.map(xy => Object.assign(xy, {cell: cellI(i,j)}))));
+  });
+  
+  const path = svg.selectAll("path") //cell_paths
+      .attr("fill", "none")
+      .attr("stroke", d => z(d.unit))  // .attr("stroke", d => "green") 
+      .attr("stroke-width", path_width.visible)
+      .attr("stroke-opacity", path_width.opacity_v)
+  
+  cell.call(brush, circle, path, svg);
+ 
+  svg.property("value", [{'Table of Selected Data':'No data selected'}])  // 
+  return svg.node();
+}
+```
+
+
+```{ojs}
+table(default_selection) 
+```
+
+```{ojs}
+md`### Table`
+```
+
+
+```{ojs}
+/**
+* Formats data for table and cleans empty output for nice display
+*/
+default_selection = {if (typeof selection[0] === "undefined") {
+  return [{'Table of Selected Data':'No data selected'}];} else {return reorderNames(selection, keyOrderNames)} }
+```
+
+```{ojs}
+/**
+* Table Display Function
+* Sorts and drop keys in each object of a data array before table display
+* Also, changes the data column name to a table display name using Object{key:value}
+* Also, rounds numbers to fix decimal places. Default is 2 decimal places.
+* Example: reorderNames(selection, {"unit": "Unit", "tx": "Treatment"})
+* @param {Object{"colName": "tableName",...}} key_order Strings of columns in desired display order
+* @param {array} array The data array of Objects where keys are columns in table
+* @param {int} fix Number of decimal places rounded. optional param. default = 2.
+* @returns {array} ordered_array Formated for table display
+*/
+reorderNames = function(array, key_order, fix=2) {
+  const keys = Object.keys(key_order);
+  var ordered_array = [];
+  let keys_included = keys.map(key => (key in array[0]));
+  if (keys_included.every(tf => tf)) {
+      array.forEach((row) => {
+        let newRow = {};
+        keys.forEach((key) => {
+          var value = row[key];
+          // round if number
+          if (typeof value === 'number') {
+            newRow[key_order[key]] = value.toFixed(fix);
+          } else {
+            newRow[key_order[key]] = value;
+          }
+        });
+        ordered_array.push(newRow);
+      });
+  };
+  return ordered_array;
+}
+```
+
+```{ojs}
+keyOrderNames = ({"unit": "Selected Unit", "tx": "Treatment", "cum_dist": "Cumulative Spikes Proportion", "timestamp": "Experiment Time (sec)", "Firing Rate": "Firing Rate (Hz)"}) 
+```
+
+<!-- This section title useful in online notebook only
+```{ojs}
+md`### Array Indexing`
+```
+-->
+
+
+```{ojs}
+cellI = function(i, j) {
+  return get_array_index(j, i, tx_panel_array);
+}
+```
+
+```{ojs}
+cellXY = function(i) {
+  return get_array_coords(i, tx_panel_array);
+}
+```
+
+```{ojs}
+get_array_index = function(row, col, array) {
+  // converts [x, y] index of 2D array into scalar index of same
+  // starting with columns of the first row
+  const col_max = array[0].length;
+  return (col) + (row * col_max);
+} 
+
+get_array_coords = function(i, array) {
+  // converts scalar index of 2D array into [x, y] index of same
+  const col_max = array[0].length;
+  return [Math.floor((i)/col_max), i%col_max];
+}
+```
+
+```{ojs}
+line = d3.line()
+    .defined(d => !(Object.values(d)).includes(NaN))
+    .x((d, i) => x[d.cell](d.x)) 
+    .y((d, i) => y[d.cell](d.y))
+```
+
+<!-- This section title useful in online notebook only
+```{ojs}
+md`### Brush`
+```
+-->
+
+
+```{ojs}
+function brush(cell, circle, path, svg) {
+  const brush = d3.brush()
+      .extent([[padding / 2, padding / 2], [size - padding / 2, size - padding / 2]])
+      .on("start", brushstarted)
+      .on("brush", brushed)
+      .on("end", brushended);
+
+  cell.call(brush);
+
+  let brushCell;  // ID of cell array actively brushed
+
+  // Clear the previously-active brush, if any.
+  function brushstarted() {
+    if (brushCell !== this) {
+      d3.select(brushCell).call(brush.move, null);
+      brushCell = this;
+    }
+  }
+
+  // Highlight the selected circles.
+// [i, j] is __cell__ index; i is col, j is row
+// each circle (data point joined to) has style "hidden" set to true if outside brush box 
+// brush box:: [[x0, y0], [x1, y1]] = selection
+// x[] (and y[]) is array of functions, each mapping the data of column to the pixels of svg
+// When each row in data is set to 'hidden' is applies directly to all cells, 
+// which are linked to a single underlying representation of the data as a single matrix.
+  function brushed({selection}, [i, j]) {
+    let selected = [];
+    let all_units = [...new Set(data_points.map(d => d.unit))];
+    let selected_units = [];
+    let not_selected_units = [];
+    let unique_selected_units = [];
+    let unique_not_selected_units = [];
+    let arr = [];
+    if (selection) {
+      const [[x0, y0], [x1, y1]] = selection; 
+      circle.classed("hidden", 
+        d => x0 >= x[cellI(i, j)](d[column_pointx[cellI(i, j)]])
+          || x1 <= x[cellI(i, j)](d[column_pointx[cellI(i, j)]])
+          || y0 >= y[cellI(i, j)](d[tx_panel_array[j][i]])  
+          || y1 <= y[cellI(i, j)](d[tx_panel_array[j][i]])  
+          || isNaN(y[cellI(i, j)](d[tx_panel_array[j][i]]))); // do not unhide points that are NaN in cell
+      selected = data_points.filter(
+        d => x0 <= x[cellI(i, j)](d[column_pointx[cellI(i, j)]])
+          && x1 >= x[cellI(i, j)](d[column_pointx[cellI(i, j)]])
+          && y0 <= y[cellI(i, j)](d[tx_panel_array[j][i]]) 
+          && y1 >= y[cellI(i, j)](d[tx_panel_array[j][i]]));
+      selected_units = selected.map(d => d.unit);
+      unique_selected_units  = [...new Set(selected_units)]; 
+      unique_not_selected_units = all_units.filter(u => !unique_selected_units.includes(u))
+      path.classed("hidden", d => unique_not_selected_units.includes(d.unit));
+    }
+    svg.property("value", selected).dispatch("input"); 
+  }
+
+  // If the brush is empty, select all circles.
+  function brushended({selection}) {
+    if (selection) return;
+    svg.property("value", []).dispatch("input");
+    circle.classed("hidden", false);
+    path.classed("hidden", false);
+  }
+}
+```
+
+<!-- This section title useful in online notebook only
+```{ojs}
+md`### Scale & Axes`
+```
+-->
+
+
+```{ojs}
+// array: for each column, a function that linearly maps domain in data to range in browser window
+// this reverses the y coord directions because in DOM y has zero at top
+y = columns_points.map(c => {
+  if (c !== "Firing Rate") { 
+    return d3.scaleLinear()
+      .domain(d3.extent(data_points, d => d[c]))
+      .range([size - padding / 2, padding / 2])
+  } else {
+    // var logZero = frLowBound // 0.01 firing once per 100 sec is smallest of interest for a neuron firing rate. I will need to clip those with smaller firing rate when cleaning data.
+    return d3.scaleLog()
+      .domain(d3.extent(data_points, d => d[c]))
+      .range([size - padding / 2, padding / 2])
+  }
+})
+```
+
+```{ojs}
+x = {
+  const x_ = columns_points.map((r, i) => d3.scaleLinear()
+      .domain(d3.extent(data_points.filter(d => (d.tx === columns_points[i])),
+                        d => d["x_idx"]))  // timestamp
+      .range([padding / 2, size - padding / 2]));
+  // kludge to use a different axis for a firing rate parallel plot
+  x_[5] = d3.scalePoint()
+      // .domain(d3.extent(data_points, d => d["Firing Rate"]))
+      .domain(["Baseline", "AMPA blocker DNQX", "BT139 1uM On", "BT139 1uM Off", "DAMGO 500nM On"])
+      .range([padding / 2, size - padding / 2]);
+  return x_;
+}
+
+// // original version
+// x = [0, 1].map(r => d3.scaleLinear()
+//       .domain(d3.extent(data_points, d => d["x_idx"]))
+//       .range([padding / 2, size - padding / 2]))
+```
+
+```{ojs}
+// maps each data row to color
+z = d3.scaleOrdinal()
+    .domain(data_points.map(d => d.unit))
+    .range(d3.schemeCategory10)
+```
+
+```{ojs}
+yAxis = {
+  const axis = d3.axisLeft()
+      .ticks(6)
+      .tickSize(-size + padding );
+  const axis_fr = d3.axisLeft()
+    .ticks(6)
+    .tickSize(-size + padding )
+    .tickValues([0.01, 0.02, 0.1, .2, 1, 2, 10, 20])
+    .tickFormat((d, i) => [0.01, 0.02, 0.1, .2, 1, 2, 10, 20][i]);
+  // next: translate for each cell position. apply scale function for each cell.
+  return g => g.selectAll("g").data(y).join("g")
+      // .attr("transform", (d, i) => `translate(${(i * size)}, ${(i * size)})`)
+      .attr("transform", (d, i) => 
+            `translate(${cellXY(i)[1] * size + padding/2}, ${cellXY(i)[0] * size})`)
+      .each(function(d, i) {
+        if (i  == 5) {
+          return d3.select(this).call(axis_fr.scale(d)).call(yFrAxisLabel);          
+        } else {
+          return d3.select(this).call(axis.scale(d)).call(yAxisLabel);}
+      })
+      .call(g => g.select(".domain").remove())
+      .call(g => g.selectAll(".tick line").attr("stroke", "#ddd"));
+}
+
+// var y_axis = d3.axisLeft().scale(yscale)
+//         .tickValues([0, .2, .5, .70, 1])
+//         .tickFormat((d, i) => ['a', 'e', 'i', 'o', 'u'][i]);
+```
+
+```{ojs}
+xAxis = {
+  const axis = d3.axisBottom()
+      .ticks(6)
+      .tickSize(size - padding );
+  const axis_fr = d3.axisBottom()  // not needed. can switch to axis ?
+      .ticks(6)
+      .tickSize(size - padding );    
+  return g => g.selectAll("g").data(x).join("g")
+      .attr("transform", (d, i) => 
+            `translate(${(cellXY(i)[1] * size)}, ${(cellXY(i)[0] * size + padding/2)})`)
+      .each(function(d, i) {
+        if (i < 5) {
+          return d3.select(this).call(axis.scale(d)).call(xAxisLabel) /// here...
+        } else if (i == 5) {
+          const cell_fr = d3.select(this).call(axis_fr.scale(d)).call(xFrAxisLabel);
+          cell_fr.selectAll(".tick text").each(function(g, j) {
+            // j is the index of each category tick in d3.scalePoint() d
+            return d3.select(this).text(tx_abrev[columns_points[j]]);
+          })
+          return cell_fr;
+        }
+      })
+      .call(g => g.select(".domain").remove())
+      .call(g => g.selectAll(".tick line").attr("stroke", "#ddd"))
+}
+```
+
+```{ojs}
+// Firing rates must clip lower bound to work on scaleLog y
+frLowBound = 0.01
+```
+
+```{ojs}
+/**
+* unfinished text label of axis
+*/
+function yAxisLabel(cell) {
+  cell.append('text')
+    .attr('text-anchor', 'end') // end
+    .attr('transform', 'rotate(-90)')
+    .attr('fill', 'black')
+    .attr('font-size', '12px')
+    // .attr('font-weight', 'bold')
+    .attr('x', yAxisLabelXPos) // width
+    .attr('y', yAxisLabelYPos) // -10
+    .text('Cumulative Proportion of Spikes');
+}
+```
+
+```{ojs}
+/**
+* unfinished text label of axis
+*/
+function yFrAxisLabel(cell) {
+  cell.append('text')
+    .attr('text-anchor', 'end') // end
+    .attr('transform', 'rotate(-90)')
+    .attr('fill', 'black')
+    .attr('font-size', '12px')
+    // .attr('font-weight', 'bold')
+    .attr('x', yAxisLabelXPos) // width
+    .attr('y', yAxisLabelYPos) // -10
+    .text('Firing Rate (Log Hz)');
+}
+```
+
+```{ojs}
+yAxisLabelYPos = -20
+```
+
+```{ojs}
+yAxisLabelXPos = -80
+```
+
+```{ojs}
+/**
+* unfinished text label of axis
+*/
+function xAxisLabel(cell) {
+  cell.append('text')
+    .attr('text-anchor', 'end') // end
+    .attr('fill', 'black')
+    .attr('font-size', '12px')
+    // .attr('font-weight', 'bold')
+    .attr('x', size - 90) // width
+    .attr('y', size- 5) // -10
+    .text('Proportion of Time in Treatment');
+}
+```
+
+```{ojs}
+/**
+* unfinished text label of axis
+*/
+function xFrAxisLabel(cell) {
+  cell.append('text')
+    .attr('text-anchor', 'end') // end
+    .attr('fill', 'black')
+    .attr('font-size', '12px')
+    // .attr('font-weight', 'bold')
+    .attr('x', size - 120) // width
+    .attr('y', size- 5) // -10
+    .text('Treatment Epoch');
+}
+```
+
+```{ojs}
+tx_abrev = ({"Baseline":"Base", "AMPA blocker DNQX":"DNQX", "BT139 1uM On":"BT139-on", "BT139 1uM Off":"BT139-off", "DAMGO 500nM On":"DAMGO", "Firing Rate":"f.r."});
+```
+
+<!-- This section title useful in online notebook only
+```{ojs}
+md`### Load & Clean Point Data`
+```
+-->
+
+
+```{ojs}
+data_points = clean_data(data, columns__fr)
+```
+
+```{ojs}
+data = d3.csvParse(await fileSelection.text(), d3.autotype)
+/* below is data selection without drop menu */
+// data = d3.csvParse(await FileAttachment("d3_cum_fr_10K_interp_825_13h36m25s.csv").text(), d3.autotype)
+```
+
+```{ojs}
+md`* _Add new data to fileAttachArray:_`
+```
+
+```{ojs}
+//| echo: true
+fileAttachArray = [FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s.csv"),
+                   FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1.csv"),
+                   FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1_rev.csv"),
+                   FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_v0.csv"),
+                   FileAttachment("d3_cum_fr_10K_interp_825_13h36m25s@2.csv"),
+                   FileAttachment('d3_cum_fr_10K_interp_825_15h01m13s.csv'),
+                   FileAttachment('d3_cum_fr_10K_interp_825_16h06m19s.csv'),
+                   FileAttachment('d3_cum_fr_10K_interp_827_12h06m26s.csv'),
+                   FileAttachment('d3_cum_fr_10K_interp_827_13h30m23s.csv'),
+                   FileAttachment('d3_cum_fr_10K_interp_827_15h57m53s.csv'),
+                   FileAttachment('d3_cum_fr_10K_interp_20211005_17h33m55s.csv'),
+                  ]
+```
+
+```{ojs}
+columns__fr = ["timestamp", "cum_dist", "x_idx", "Baseline", "AMPA blocker DNQX", "BT139 1uM On", "BT139 1uM Off", "DAMGO 500nM On", "Firing Rate"]
+```
+
+```{ojs}
+// This is the graphic cell matrix layout of the Treatment groups
+tx_panel_array = [["Baseline", "AMPA blocker DNQX", "BT139 1uM On"], ["BT139 1uM Off", "DAMGO 500nM On", "Firing Rate"]]
+```
+
+```{ojs}
+columns_points = tx_panel_array.flat()
+```
+
+```{ojs}
+// Indicates what data column is used for each cell in graphic matrix
+column_pointx = Array(5).fill('x_idx').concat(['tx']) //data_points.columns.slice(-1)
+```
+
+```{ojs}
+/**
+* takes raw python generated data as input applies cleanCumDist()
+* returns same data array with empty strings set to NaN
+*
+* @param {array} data raw python data
+* @param {array} columns_list array of column name strings
+* @returns {array} clean_data
+*/
+clean_data = function(data, columns_list) {
+  const temp_columns = data.columns;
+  let clean_data = data.map(d => d); // create shallow copy
+  clean_data.map(row => {
+    columns_list.forEach((col) => {
+      row[col] = cleanCumDist(row[col]);
+      if (col === 'Firing Rate') {
+        row[col] = clipLowFR(row[col], frLowBound)
+      }
+    }
+  )});
+  clean_data['columns'] = temp_columns
+  return clean_data;
+}
+```
+
+```{ojs}
+/**
+* clips value less than a threshold to that threshold
+* note, this should return NaN as NaN
+*/
+clipLowFR = function clipLowFR(firingRate, frLowBound) {
+  if (firingRate < frLowBound) {return frLowBound};
+  return +firingRate;
+}
+```
+
+```{ojs}
+// converts numeric string to number or NaN if empty string
+cleanCumDist = function cleanCumDist(data_row) {
+  if (data_row == "") {return NaN};
+  return +data_row;
+}
+```
+
+<!-- This section title useful in online notebook only
+```{ojs}
+md`### Create Path Data`
+```
+-->
+
+
+```{ojs}
+/**
+ * Create path arrays for unit lines in d3 graphs
+ *
+*/
+data_paths = {  
+  const columns = columns_points // data_points.columns.slice(0,-2) // tx groups are columns ie v1, v2...
+  let x_unit = "1" // default unit to use for a single x for all plots. may change to unique for each unit.
+  const unique_units = [...new Set(data_points.map(d => d.unit))];
+  const path_xy_arrays = get_path_xy_arrays(data_points, columns, x_col);
+  let tx_unit_array = []
+  columns.forEach((tx_col) => {
+      let tx_obj = {y: tx_col + '_metric',
+                    series: path_xy_arrays[tx_col],
+                    x_idx: get_path_array(x_col[tx_col], x_unit)
+                    };
+      tx_unit_array[tx_col] = tx_obj;}
+                  )
+
+  return tx_unit_array; 
+}
+```
+
+```{ojs}
+x_col = ({"Baseline" : 'x_idx',
+          "AMPA blocker DNQX" : 'x_idx',
+          "BT139 1uM On" : 'x_idx',
+          "BT139 1uM Off" : 'x_idx',
+          "DAMGO 500nM On" : 'x_idx',
+          "Firing Rate" : 'tx'});
+```
+
+```{ojs}
+/**
+* code to grab the value arrays for each column of data_paths
+*
+* @param {string} x_col : The column name containing paths x value
+*
+*/
+get_path_xy_arrays = function(data_points, col_list, x_col) {
+  
+  const unit_list = [...new Set(data_points.map(d => d.unit))]
+  let temp_array = [];
+  col_list.forEach(col_tx => 
+                   {temp_array[col_tx] = [];
+                    unit_list.forEach(unit => {
+                      temp_array[col_tx][unit] = {unit: unit,
+                                                  values: [], 
+                                                  x_idx: []};
+                    });
+                   }); 
+  data_points.forEach(row => {
+    col_list.forEach(col_tx => {
+      if (typeof row[col_tx] !== 'undefined') {
+        temp_array[col_tx][row.unit]['values'].push(row[col_tx]);  // path y value
+        temp_array[col_tx][row.unit]['x_idx'].push(row[x_col[col_tx]]);  // path x value
+      }
+      temp_array[col_tx][row.unit]['coords'] =
+        zip_coord_arrays(temp_array[col_tx][row.unit]['x_idx'], 
+                         temp_array[col_tx][row.unit]['values']); // use zip_coord_arrays() for d3.zip()
+    })
+  });
+  return temp_array;
+}
+```
+
+```{ojs}
+// does this already exists as d3.zip()
+// d3.zip() fails to replace this. WHY?
+zip_coord_arrays = function(arr1, arr2) {
+  // zips array [x1, x2, ...] and array [y1, y2, ...] into new array [[x1, y1], [x2, y2], ...]
+  if (arr1.length != arr2.length) {
+    return undefined;}
+  else {
+    let zipped = []
+    for(let i=0; i < arr1.length; i++) {
+      let coord = {x: arr1[i], y: arr2[i]};
+      if (!Object.values(coord).includes(NaN)) {
+        zipped.push(coord);
+      };
+    }
+    return zipped;
+  }
+}
+```
+
+```{ojs}
+/**
+* code to grab the value arrays for each column of data_paths
+*
+* @param {string} col_name Name of column with data, example 'x value'
+* @param {int} unit The unit id num
+*/
+get_path_array = function(col_name, unit) {
+  let temp_array = [];
+  if (typeof unit === 'undefined') {
+    data_points.forEach(d => temp_array.push(d[col_name]));
+  } else {
+    data_points.forEach(d => {
+      if ((d.unit == unit) &&
+          // alternatively use (d[col_name] !== undefined) without quotes
+          (typeof d[col_name] !== 'undefined')) {
+        temp_array.push(d[col_name]);
+      }
+    }
+                        );                    
+  }
+  return temp_array;
+  // return temp_array.filter(d => !isNaN(d));
+}
+```
+
+<!-- This section title useful in online notebook only
+```{ojs}
+md`### Data Graphic Formatting`
+```
+-->
+
+
+```{ojs}
+point_radius = {let point_radius = {};
+ point_radius['hidden'] = 0.1;  // 0.1
+ point_radius['visible'] = 1.5; // 1.5
+ point_radius['opacity_v'] = 0.5;
+ return point_radius;
+}
+```
+
+```{ojs}
+path_width = {let path_width = {};
+ path_width['hidden'] = 0.5;
+ path_width['visible'] = 3;
+ path_width['opacity_v'] = 0.7;
+ return path_width;
+}
+```
+
+
+<!-- This section title useful in online notebook only
+```{ojs}
+md`### Constants & Imports`
+```
+-->
+
+```{ojs}
+// the x-value column for cumulative spike graphs
+cumX = 'x_idx' // 'timestamp'
+```
+
+```{ojs}
+panel_rows = tx_panel_array.length
+```
+
+```{ojs}
+// rename to cellCols?
+panel_cols = tx_panel_array[0].length
+```
+
+```{ojs}
+width = 954
+```
+
+```{ojs}
+height = width * panel_rows / panel_cols 
+```
+
+```{ojs}
+// This is size of a single cell in composite plot
+size = (width - (panel_cols + 1) * padding) / panel_cols + padding
+```
+
+```{ojs}
+padding = 32 
+```
+
+```{ojs}
+d3 = require("d3@6")
+```
+
+```{ojs}
+import {swatches} from "@d3/color-legend"
+```
+
+```{ojs}
+// drop menue fileSelection
+import {select} from "@jashkenas/inputs"
+```
+
+```{ojs}
+import { table } from "@gampleman/table" 
+```
+
+
+
+
