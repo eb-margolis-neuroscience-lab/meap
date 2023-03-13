@@ -1,21 +1,76 @@
 import yaml
 import os
-from IPython.display import display
 from datetime import datetime
 import xlrd
 import pathlib
+import argparse
+
 
 from meappy.configuration import USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST
+    # USER_PATHS, DEFAULT_USER, DEFAULT_XL_TAB, DEFAULT_XL_COLS
 from meappy.meappy_data import get_test_data_path
 
 
 
-## ipywidget display settings for jupyter lab notebook
-# import ipywidgets as widgets
-# from ipywidgets import Layout
-# ext_text = Layout(width='800px')
-# ext_xlrow = Layout(width='1200px',  height='40px')
+DESCRIPTION = """Create data folder and metadata from the experiment log
 
+To use
+
+    cd path/to/MED64_Data
+    # edit MED64_ExperimentsForAnalysis.xls
+
+    python /path/to/meap/meappy/meappy/parameter_yaml.py
+
+Note that to to figure setup, edit `path/to/MED64_Data/configuration.py`
+
+"""
+
+def parse_arguments(argv):
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser.add_argument(
+        "--data_root", type=str, action="store", dest="data_root",
+        help="""Select user paths configuration""", default=".")
+    
+    parser.add_argument(
+        "--slice_template_path", type=str, action="store", dest="slice_template_path",
+        help="""Path to slice_template.yaml to use as a template for slice paramters""",
+        default=DEFAULT_SLICE_TEMPLATE_PATH)
+
+    parser.add_argument(
+        "--protocol_template_path", type=str, action="store", dest="protocol_template_path",
+        help="""Path to slice_template.yaml to use as a template for protocol paramters""",
+        default=DEFAULT_PROTOCOL_TEMPLATE_PATH)
+    
+    parser.add_argument(
+        "--protocol_id" type=str, action="store", dest="protocol_id",
+        help="""Select protocol (i.e. a tab in the MED64_ExperimentsForAnalysis.xls)""",
+        default = None)
+
+    parser.add_argument(
+        "--fields", nargs="+", type=str, action="store", dest="XL_COLS",
+        help="""Select meta data fieilds for each recording (i.e. columns in a tab in the MED64_ExperimentForAnalysis.xls) (Default: XL_COLS in configuration.py)""",
+        default = DEFAULT_SAMPLE_FIELDS)
+
+    parser.add_argument(
+        "--sample_ids", nargs="+", type=str, action="store", dest="sample_ids",
+        help="""Select recording ids (i.e. rows in tab in the MED64_ExperimentsForAnalysis.xls), default to all""",
+        default = None)
+
+    args = parser.parse_args()
+    
+    return args
+
+def build_user_paths(args, user_paths=USER_PATHS):
+    if args.user not in USER_PATHS.keys():
+        raise KeyError(f"User {args.user} not in known USER_PATHS {USER_PATHS.keys()}")
+
+    user_paths = USER_PATHS[args.user]
+    user_paths["protocol_output"] = os.path.join(
+        user_paths["base"], "experiment", user.protocol)
+    user_paths["slice_template"] = os.path.join(
+        user_paths["base"], args.slice_template_path)
+    user_paths["protocol_template"] = os.path.join(
+        user_paths["base"], args.protocol_template_path)
 
 def set_output_paths(user=USER, user_paths=USER_PATHS, protocol_dir=r""):
     # write check for os paths
@@ -239,10 +294,13 @@ def get_xl_data(tab_name, row_id_list=None):
     return {row: xl[row] for row in row_id_list}, researchers
 
 
-def main():
+def main(argv):
     """for development and testing, use:
     `xl = mock_excel()`
     """
+
+    args = parse_args(argv)
+
     user = set_user(USER)
     print(f"set user to: {user}")
 
@@ -252,6 +310,5 @@ def main():
     created_protocol_params_location = create_protocol_parms(researchers)
     
 
-
 if __name__ == "__main__":
-    main()
+    main(sys.argv)

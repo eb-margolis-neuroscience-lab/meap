@@ -53,6 +53,7 @@ notebooks/obs_crossfilter_plots_data/
 obs_crossfilter_plots_data/
 notebooks/obs_crossfilter_plots_files/
 obs_crossfilter_plots_files/
+notebooks/obs_crossfilter_plots.html
 
 # Mac OS files
 .DS_Store
