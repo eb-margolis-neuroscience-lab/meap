@@ -15,7 +15,7 @@ base_path = meap_path.parent.absolute()
 data_base_path = path.join(_HOME, 'Data')
         # /med64/experiment/VTA_NMDA/20211005_17h33m55s
     
-params_examples = path.join(meap_path, 'parameter_examples')  # for out-of-box examples using github repo
+params_examples = path.join(meap_path, 'doc/parameter_examples/')  # for out-of-box examples using github repo
 params_path = path.join(data_base_path, 'meap/experiment_log')
 
 # box shared directory
