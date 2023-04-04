@@ -60,6 +60,8 @@ notebooks/obs_crossfilter_plots.html
 
 # meappy development
 # *.xls
+# xls lock file
+.~lock.*  
 _dev/
 temp_test_data/
 
