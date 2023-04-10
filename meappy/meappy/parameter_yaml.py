@@ -6,6 +6,7 @@ import openpyxl
 import pathlib
 import re, string
 import sys, argparse
+from copy import deepcopy
 
 from meappy.configuration import USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST, COMPOSITE_ROW_ID, XLCOL
     # USER_PATHS, DEFAULT_USER, DEFAULT_XL_TAB, DEFAULT_XL_COLS
@@ -111,41 +112,6 @@ def get_time_param(time_str):
     return time_param
 
 
-def xl_to_slice_params_v0(xl, slice_param_template):
-    """
-    DEPRECATED
-    """
-    slice_params = slice_param_template
-
-    date_str = xl["date"]
-    time_str = xl["slice_time"]
-    slice_id = date_str + "_" + time_str
-
-    slice_params["slice_metadata"]["date"] = get_date_param(date_str)
-    slice_params["slice_metadata"]["time"] = get_time_param(time_str)
-    slice_params["slice_metadata"]["notes"] = (
-        "Channels: " + xl["notes_issues"] + "\nMisc: " + xl["notes"]
-    )
-    slice_params["slice_metadata"]["region"] = xl["region"]
-    slice_params["slice_metadata"]["type"] = xl["experiment_type"]
-    slice_params["slice_metadata"]["protocol"] = XL_TAB
-    slice_params["slice_metadata"]["cut_by"] = xl["cut_by"]
-    slice_params["slice_metadata"]["run_by"] = xl["run_by"]
-    slice_params["slice_metadata"]["recording_site"] = "[dorsal, medial, ventral]"
-
-    unit_timestamps_filename = slice_id + "_units_ts.mat"
-    treatments_filename = slice_id + "_treatments.csv"
-    electrode_filename = slice_id + "_unit_electrode.csv"
-    image_filename = slice_id + ".jpg"
-    slice_params["paths"]["base"] = r"experiment"
-    slice_params["paths"]["protocol"] = XL_TAB
-    slice_params["paths"]["slice"] = slice_id
-    slice_params["paths"]["unit"] = unit_timestamps_filename
-    slice_params["paths"]["treatment"] = treatments_filename
-    slice_params["paths"]["photo"] = image_filename
-    return slice_params
-
-
 def xl_to_protocol_params(researchers, protocol_param_template):
     """Most of these parameters are manually set in the protocol_parameters.yaml"""
     protocol_params = protocol_param_template
@@ -158,28 +124,6 @@ def mkdir_slice(slice_id=""):
     protocol_dir_path = pathlib.Path(USER_PATHS[USER]["protocol_output"])
     slice_dir_path = protocol_dir_path / slice_id
     slice_dir_path.mkdir(mode=511, parents=True, exist_ok=True)
-
-
-def create_slice_params_v0(xl):
-    """
-    Deprecated
-    """
-    with open(USER_PATHS[USER]["slice_template"], "r") as file:
-        slice_param_template = yaml.safe_load(file)
-    slice_params = xl_to_slice_params(xl, slice_param_template)
-    slice_params_dump = yaml.dump(
-        slice_params, sort_keys=False, indent=4, default_flow_style=False
-    )
-    slice_dump_filepath = (
-        pathlib.Path(USER_PATHS[USER]["protocol_output"])
-        / slice_params["paths"]["slice"]
-        / r"slice_parameters.yaml"
-    )
-    mkdir_slice(slice_params["paths"]["slice"])
-
-    with open(slice_dump_filepath, "w", encoding="utf-8") as yaml_file:
-        yaml_file.write(slice_params_dump)
-        print(f"Parameter slice params written to: {slice_dump_filepath}")
 
 
 def create_protocol_parms(researchers):
@@ -234,76 +178,6 @@ def mock_excel():
     # pprint(xl.items())
     return xl
 
-
-def get_researcher_list(ws, col_list):
-    """collects the list of all researchers in cut_by and run_by columns of a sheet"""
-    researchers = set()
-    for n in range(ws.nrows):
-        if n == 0:
-            continue
-        for col in col_list:
-            researchers.add(ws.row(n)[col].value)
-    researchers = [r for r in researchers if r != ""]
-    return researchers
-
-
-def get_xl_data(tab_name, row_id_list=None):
-    """
-    DEPRECATED
-    Fetch and format Excel notebook of experimental data
-    NOTE: the column names for slice_time_col_name (etc) should
-    be moved to constants in configuration.py file
-    """
-
-    def values(row):
-        return [cell.value for cell in row]
-
-    xls_file = USER_PATHS[USER]["exp_xlsx"]
-    wb = xlrd.open_workbook(xls_file)
-
-    tab_names = [sh.name for sh in wb.sheets()]
-
-    if tab_name not in tab_names:
-        raise KeyError(
-            f'"{tab_name}" is not found in this excel file.\nTabs Found:\n{tab_names}'
-        )
-    ws = wb.sheet_by_name(tab_name)
-
-    xl_cols = values(ws.row(0))
-    xl_cols_new = XL_COLS
-    if len(xl_cols) != len(xl_cols_new):
-        raise IndexError(
-            f"Excel file column names do not match expected\n{list(zip(xl_cols_new, xl_cols))}"
-        )
-    xl_cols_new = xl_cols_new  # change to xl_cols_new if prefered
-    date_col_name = xl_cols_new[0]
-    slice_time_col_name = xl_cols_new[9]
-    cut_by_index = xl_cols_new.index("cut_by")
-    run_by_index = xl_cols_new.index("run_by")
-
-    researchers = get_researcher_list(ws, [cut_by_index, run_by_index])
-
-    xl = dict()
-    for n in range(ws.nrows):
-        if n == 0:
-            continue
-        if ws.row(n)[0].value == r"":
-            continue
-        xl_row_values = values(ws.row(n))
-        xl_row_dict = dict(zip(xl_cols_new, xl_row_values))
-        row_id = (
-            str(int(xl_row_dict[date_col_name]))
-            + "_"
-            + str(xl_row_dict[slice_time_col_name])
-        )
-        xl[row_id] = xl_row_dict
-        xl[row_id][date_col_name] = str(int(xl[row_id][date_col_name]))
-
-    if row_id_list is None:
-        return list(xl.values())
-    if not set(row_id_list) <= set(xl.keys()):
-        raise KeyError(f"{row_id_list} not in {list(xl.keys())}")
-    return {row: xl[row] for row in row_id_list}, researchers
 
 
 def clean_xl_col_names(sheet_data):
@@ -427,59 +301,81 @@ def clean_identifiers(name_list):
     clean_list = [alphanum(str) for str in name_list]
     return clean_list
     
+    
+def log_error(error_message):
+    print(f'WRITE TO FILE: {error_message}')
+    
         
+def read_xl_row(row_name, xl, slice_params):
+    date_str = str(xl[XLCOL["date"]]).strip()
+    time_str = xl[XLCOL["slice_time"]]
+
+    try:
+        slice_id = date_str + "_" + time_str
+        slice_params["slice_metadata"]["date"] = get_date_param(date_str)
+        slice_params["slice_metadata"]["time"] = get_time_param(time_str)
+    except:
+        raise ValueError(f'Date/Time format error in \
+        time_str{time_str}, date_str: {date_str}')
+        
+    slice_params["slice_metadata"]["notes"] = (
+        "Channels: " + str(xl[XLCOL["notes_issues"]]) + \
+        "\nMisc: " + str(xl[XLCOL["notes"]])
+    )
+    slice_params["slice_metadata"]["region"] = xl[XLCOL["region"]]
+    slice_params["slice_metadata"]["type"] = xl[XLCOL["experiment_type"]]
+    slice_params["slice_metadata"]["protocol"] = XL_TAB
+    slice_params["slice_metadata"]["cut_by"] = xl[XLCOL["cut_by"]]
+    slice_params["slice_metadata"]["run_by"] = xl[XLCOL["run_by"]]
+    slice_params["slice_metadata"]["recording_site"] = "[dorsal, medial, ventral]"
+
+    unit_timestamps_filename = slice_id + "_units_ts.mat"
+    treatments_filename = slice_id + "_treatments.csv"
+    electrode_filename = slice_id + "_unit_electrode.csv"
+    image_filename = slice_id + ".jpg"
+    slice_params["paths"]["base"] = r"experiment"
+    slice_params["paths"]["protocol"] = XL_TAB
+    slice_params["paths"]["slice"] = slice_id
+    slice_params["paths"]["unit"] = unit_timestamps_filename
+    slice_params["paths"]["treatment"] = treatments_filename
+    slice_params["paths"]["photo"] = image_filename
+
+    return slice_params
+        
+    
 def xl_to_slice_params(xl_dict, slice_param_template):
     """
     Fill in the slice parameter yaml dict to dump to yaml file
     REPLACE xl with row
     """
-    slice_params = slice_param_template
+    params_dict = dict()
+    
     debug_list = [(n, d) for n, d in xl_dict.items()]
     
-    # for tab_name, tab_dict in xl_dict.items():
-    for tab_name, tab_dict in debug_list[1:3]:
+    for tab_name, tab_dict in xl_dict.items():
+    # for tab_name, tab_dict in debug_list[1:3]:   # debug
+        params_dict[tab_name] = dict()
         for row_name, xl in tab_dict.items():
-            date_str = str(xl[XLCOL["date"]]).strip()
-            time_str = xl[XLCOL["slice_time"]]
-            
+            # print(f'\nrow_name: {row_name}')
             try:
-                slice_id = date_str + "_" + time_str
-                slice_params["slice_metadata"]["date"] = get_date_param(date_str)
-                slice_params["slice_metadata"]["time"] = get_time_param(time_str)
-            except:
-                raise ValueError(f'Date/Time format error in \
-                tab: {tab_name}, row: {row_name}, time_str{time_str}, date_str: {date_str}')
-            slice_params["slice_metadata"]["notes"] = (
-                "Channels: " + str(xl[XLCOL["notes_issues"]]) + \
-                "\nMisc: " + str(xl[XLCOL["notes"]])
-            )
-            slice_params["slice_metadata"]["region"] = xl[XLCOL["region"]]
-            slice_params["slice_metadata"]["type"] = xl[XLCOL["experiment_type"]]
-            slice_params["slice_metadata"]["protocol"] = XL_TAB
-            slice_params["slice_metadata"]["cut_by"] = xl[XLCOL["cut_by"]]
-            slice_params["slice_metadata"]["run_by"] = xl[XLCOL["run_by"]]
-            slice_params["slice_metadata"]["recording_site"] = "[dorsal, medial, ventral]"
+                row_params = read_xl_row(row_name, xl, slice_param_template)
+            except Exception as e:
+                error_message = f'Date/Time format error in \
+                tab: {tab_name}, row: {row_name}, {e}'
+                
+                log_error(e)
+                log_error(error_message)
+                
+                continue
 
-            unit_timestamps_filename = slice_id + "_units_ts.mat"
-            treatments_filename = slice_id + "_treatments.csv"
-            electrode_filename = slice_id + "_unit_electrode.csv"
-            image_filename = slice_id + ".jpg"
-            slice_params["paths"]["base"] = r"experiment"
-            slice_params["paths"]["protocol"] = XL_TAB
-            slice_params["paths"]["slice"] = slice_id
-            slice_params["paths"]["unit"] = unit_timestamps_filename
-            slice_params["paths"]["treatment"] = treatments_filename
-            slice_params["paths"]["photo"] = image_filename
-    return slice_params
+            # print(f'\ntab_name: {tab_name} == row_name: {row_name}')
+            # print(f'row_params: {row_params}')
+            params_dict[tab_name][row_name] = deepcopy(row_params)
+    # print(params_dict)
+    return params_dict   
 
     
-def create_slice_params(xl_dict):
-    """
-    xl == tab_dict; xl_dict
-    """   
-    with open(USER_PATHS[USER]["slice_template"], "r") as file:
-        slice_param_template = yaml.safe_load(file)
-    slice_params = xl_to_slice_params(xl_dict, slice_param_template)
+def write_slice_params(slice_params):       
     slice_params_dump = yaml.dump(
         slice_params, sort_keys=False, indent=4, default_flow_style=False
     )
@@ -493,7 +389,27 @@ def create_slice_params(xl_dict):
     with open(slice_dump_filepath, "w", encoding="utf-8") as yaml_file:
         yaml_file.write(slice_params_dump)
         print(f"Parameter slice params written to: {slice_dump_filepath}")
+    return None
     
+    
+def create_slice_params(xl_dict):
+    """
+    xl == tab_dict; xl_dict
+    
+    params_dict[tab_name][row_name]
+    """   
+    with open(USER_PATHS[USER]["slice_template"], "r") as file:
+        slice_param_template = yaml.safe_load(file)
+    # print(f'slice_param_template: {slice_param_template}')
+    params_dict = xl_to_slice_params(xl_dict, slice_param_template)
+    
+    for tab, rows in params_dict.items():
+        for row in rows.keys():
+            slice_params = params_dict[tab][row]
+            # print(f'slice_params {slice_params}')
+            write_slice_params(slice_params)
+    return None
+
     
 def test_square():
    n = 2
@@ -506,7 +422,8 @@ def main(argv):
     """
 
     args = parse_arguments(argv)
-
+    print(f'ARGS: {args}')
+    
     user = set_user(USER)
     
     ## new to get all files
@@ -514,13 +431,8 @@ def main(argv):
     col_names, tab_dict = get_xls_data(xls_file)
     # print(f'tab_dict keys: {tab_dict.keys()}')
     print(clean_identifiers(col_names))
-    create_slice_params(tab_dict)
     
-    ### old to read only one file ###
-    # xl, researchers = get_xl_data(XL_TAB, ROW_ID_LIST)
-    # for row_id in ROW_ID_LIST:
-    #     created_slice_params_location = create_slice_params(xl[row_id])
-    # created_protocol_params_location = create_protocol_parms(researchers)
+    create_slice_params(tab_dict)
     
 
 if __name__ == "__main__":
