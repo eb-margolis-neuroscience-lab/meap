@@ -48,9 +48,8 @@ USER_PATHS = {
 USER = "meappy_data"  #"walter"  #  'elayne'  # walter_box
 COMPOSITE_ROW_ID = ('Date', 'Slice #')  # These are column names of row info used to create composite row_id
 
+LOG_FILE = '/Users/walter/Data/meap/experiment/log_file.txt'
 
-XL_TAB = "VTA_EM1_Dose_Response"  #'LHb' # 'VTA_NMDA_Apamin' #'VTA_NMDA'
-# 'HbL' # 'HB_139_DAMGO'
 
 # [('date', 'Date'), ('cut_by', 'Cut by'), ('run_by', 'Run by'), ('region', 'Recording  Region'), ('project', 'Slice Location'), ('experiment_type', 'Project'), ('drugs_dose_used', 'Experiment Type'), ('vendor_batch', 'Drugs Used'), ('slice_time', 'Vendor/Batch'), ('is_photo_saved', 'Slice #'), ('notes_issues', 'Photo saved'), ('is_exported', 'Notes/Problems/Issues'), ('is_sorted', 'Exported?'), ('notes', 'Analyzed?')]
 
@@ -91,35 +90,6 @@ XL_COLS = [
     "notes",
 ]
 
-# XL_COLS_old = [
-#     "date",
-#     "cut_by",
-#     "run_by",
-#     "region",
-#     "project",
-#     "experiment_type",
-#     "drugs_dose_used",
-#     "vendor_batch",
-#     "slice_time",
-#     "is_photo_saved",
-#     "notes_issues",
-#     "is_exported",
-#     "is_sorted",
-#     "notes",
-# ]
-
-# ROW_ID_LIST = ['20211006_15h58m38s', '20211005_17h33m55s'] #, '20211006_15h58m38s']  # NMDA_Apamin
-# ROW_ID_LIST = ['20200825_12h24m37s', '20200825_13h36m25s'] # LHb
-ROW_ID_LIST = [
-    "20211105_15h48m31s",
-    "20211109_15h09m07s",
-    "20211109_17h18m41s",
-    "20211110_15h00m50s",
-    "20211122_13h47m47s",
-    "20211130_17h27m13s",
-    "20211202_18h13m40s",
-    "20211202_14h49m06s",
-]  # VTA_EM1_Dose_Response
 
 # Analysis Paths
 # for v1 NWB file format
@@ -138,3 +108,8 @@ slice_dir = r"825_12h24m37s"  # '20200825_12h24m37s'
 ############
 # NEXT.... #
 ############
+
+## for parse_arguments()
+DEFAULT_SLICE_TEMPLATE_PATH = ""
+DEFAULT_PROTOCOL_TEMPLATE_PATH = "" 
+DEFAULT_SAMPLE_FIELDS = ""

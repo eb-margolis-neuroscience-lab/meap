@@ -7,14 +7,20 @@ import pathlib
 import re, string
 import sys, argparse
 from copy import deepcopy
+import logging
 
-from meappy.configuration import USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST, COMPOSITE_ROW_ID, XLCOL
-    # USER_PATHS, DEFAULT_USER, DEFAULT_XL_TAB, DEFAULT_XL_COLS
 from meappy.meappy_data import get_test_data_path
+from meappy.configuration import (USER_PATHS, USER, XL_COLS, 
+                                  COMPOSITE_ROW_ID, XLCOL, LOG_FILE,
+                                  DEFAULT_SLICE_TEMPLATE_PATH, 
+                                  DEFAULT_PROTOCOL_TEMPLATE_PATH, 
+                                  DEFAULT_SAMPLE_FIELDS)
 
-DEFAULT_SLICE_TEMPLATE_PATH = ""
-DEFAULT_PROTOCOL_TEMPLATE_PATH = "" 
-DEFAULT_SAMPLE_FIELDS = ""
+
+logging.basicConfig(format='%(levelname)s: %(asctime)s >> %(message)s', datefmt='%Y-%m-%d %I:%M:%S', 
+                    filename= LOG_FILE, 
+                    encoding='utf-8', level=logging.DEBUG)
+
 
 DESCRIPTION = """Create data folder and metadata from the experiment log
 
@@ -64,6 +70,7 @@ def parse_arguments(argv):
     
     return args
 
+
 def build_user_paths(args, user_paths=USER_PATHS):
     if args.user not in USER_PATHS.keys():
         raise KeyError(f"User {args.user} not in known USER_PATHS {USER_PATHS.keys()}")
@@ -79,8 +86,8 @@ def build_user_paths(args, user_paths=USER_PATHS):
 
 def set_output_paths(user=USER, user_paths=USER_PATHS, protocol_dir=r""):
     # write check for os paths
-    output_path = os.path.join(user_paths[user]["output"], r"experiment", protocol_dir)
-    user_paths[user]["protocol_output"] = os.path.join(output_path)
+    output_path = os.path.join(user_paths[user]["output"], r"experiment")
+    user_paths[user]["protocol_output"] = os.path.join(output_path, protocol_dir)
 
 
 def set_input_paths(user=USER, user_paths=USER_PATHS):
@@ -96,7 +103,7 @@ def set_user(user_name, user_paths=USER_PATHS):
     if user_name not in user_paths:
         raise KeyError(f"User {user_name} not in known USER_PATHS {USER_PATHS.keys()}")
     set_input_paths(user_name)
-    set_output_paths(user_name, protocol_dir=XL_TAB)
+    set_output_paths(user_name)
     return user_name
 
 
@@ -112,11 +119,11 @@ def get_time_param(time_str):
     return time_param
 
 
-def xl_to_protocol_params(researchers, protocol_param_template):
+def xl_to_protocol_params(researchers, protocol_name, protocol_param_template):
     """Most of these parameters are manually set in the protocol_parameters.yaml"""
     protocol_params = protocol_param_template
     protocol_params["protocol_metadata"]["researchers"] = researchers
-    protocol_params["protocol_metadata"]["protocol"] = XL_TAB
+    protocol_params["protocol_metadata"]["protocol"] = protocol_name
     return protocol_params
 
 
@@ -126,10 +133,10 @@ def mkdir_slice(slice_id=""):
     slice_dir_path.mkdir(mode=511, parents=True, exist_ok=True)
 
 
-def create_protocol_parms(researchers):
+def create_protocol_params(researchers, protocol_name):
     with open(USER_PATHS[USER]["protocol_template"], "r") as file:
         protocol_param_template = yaml.safe_load(file)
-    protocol_params = xl_to_protocol_params(researchers, protocol_param_template)
+    protocol_params = xl_to_protocol_params(researchers, protocol_name, protocol_param_template)
     protocol_params_dump = yaml.dump(
         protocol_params, sort_keys=False, indent=4, default_flow_style=False
     )
@@ -139,7 +146,7 @@ def create_protocol_parms(researchers):
     mkdir_slice()
     with open(protocol_dump_file, "w", encoding="utf-8") as yaml_file:
         yaml_file.write(protocol_params_dump)
-    print(f"Parameter protocol written to: {protocol_dump_file}")
+    logging.info(f"Parameter protocol written to: {protocol_dump_file}")
 
 
 def mock_excel():
@@ -174,7 +181,6 @@ def mock_excel():
         "notes",
     ]
     xl = dict(zip(xl_cols, xl_row.split("\t")))
-    # print('\nExcel Experiments [tab: ' + XL_TAB + ']')
     # pprint(xl.items())
     return xl
 
@@ -303,10 +309,10 @@ def clean_identifiers(name_list):
     
     
 def log_error(error_message):
-    print(f'WRITE TO FILE: {error_message}')
+    print(f'ERROR FOR FILE: {error_message}')
     
         
-def read_xl_row(row_name, xl, slice_params):
+def read_xl_row(row_name, tab_name, xl, slice_params):
     date_str = str(xl[XLCOL["date"]]).strip()
     time_str = xl[XLCOL["slice_time"]]
 
@@ -315,8 +321,8 @@ def read_xl_row(row_name, xl, slice_params):
         slice_params["slice_metadata"]["date"] = get_date_param(date_str)
         slice_params["slice_metadata"]["time"] = get_time_param(time_str)
     except:
-        raise ValueError(f'Date/Time format error in \
-        time_str{time_str}, date_str: {date_str}')
+        raise ValueError(f'Date/Time format error in ' + \
+                         f'time_str{time_str}, date_str: {date_str}')
         
     slice_params["slice_metadata"]["notes"] = (
         "Channels: " + str(xl[XLCOL["notes_issues"]]) + \
@@ -324,7 +330,7 @@ def read_xl_row(row_name, xl, slice_params):
     )
     slice_params["slice_metadata"]["region"] = xl[XLCOL["region"]]
     slice_params["slice_metadata"]["type"] = xl[XLCOL["experiment_type"]]
-    slice_params["slice_metadata"]["protocol"] = XL_TAB
+    slice_params["slice_metadata"]["protocol"] = tab_name
     slice_params["slice_metadata"]["cut_by"] = xl[XLCOL["cut_by"]]
     slice_params["slice_metadata"]["run_by"] = xl[XLCOL["run_by"]]
     slice_params["slice_metadata"]["recording_site"] = "[dorsal, medial, ventral]"
@@ -334,7 +340,7 @@ def read_xl_row(row_name, xl, slice_params):
     electrode_filename = slice_id + "_unit_electrode.csv"
     image_filename = slice_id + ".jpg"
     slice_params["paths"]["base"] = r"experiment"
-    slice_params["paths"]["protocol"] = XL_TAB
+    slice_params["paths"]["protocol"] = tab_name
     slice_params["paths"]["slice"] = slice_id
     slice_params["paths"]["unit"] = unit_timestamps_filename
     slice_params["paths"]["treatment"] = treatments_filename
@@ -342,6 +348,15 @@ def read_xl_row(row_name, xl, slice_params):
 
     return slice_params
         
+    
+def clean_researchers_list(protocol_dict):
+    """
+    Arg: dict, keys are slice_ids values are slice_parameter_template structure
+    Returns: str, Cleaned up list of researchers from experiments in a protocol.
+    """
+    researchers = ", ".join(set([row['slice_metadata']['run_by'] for row in protocol_dict.values()]))
+    return researchers
+    
     
 def xl_to_slice_params(xl_dict, slice_param_template):
     """
@@ -353,27 +368,31 @@ def xl_to_slice_params(xl_dict, slice_param_template):
     debug_list = [(n, d) for n, d in xl_dict.items()]
     
     for tab_name, tab_dict in xl_dict.items():
-    # for tab_name, tab_dict in debug_list[1:3]:   # debug
         params_dict[tab_name] = dict()
         for row_name, xl in tab_dict.items():
             # print(f'\nrow_name: {row_name}')
             try:
-                row_params = read_xl_row(row_name, xl, slice_param_template)
+                row_params = read_xl_row(row_name, tab_name, xl, slice_param_template)
             except Exception as e:
-                error_message = f'Date/Time format error in \
-                tab: {tab_name}, row: {row_name}, {e}'
-                
+                error_message = (f'Date/Time format error in ' + \
+                                 f'tab: {tab_name}, row: {row_name}, {e}')
                 log_error(e)
                 log_error(error_message)
-                
+                logging.error(e)
+                logging.error(error_message)
                 continue
 
             # print(f'\ntab_name: {tab_name} == row_name: {row_name}')
             # print(f'row_params: {row_params}')
             params_dict[tab_name][row_name] = deepcopy(row_params)
+        protocol_name = tab_name
+        researchers = clean_researchers_list(params_dict[tab_name])
+        
+        set_output_paths(protocol_dir=protocol_name)
+        create_protocol_params(researchers, protocol_name)
     # print(params_dict)
     return params_dict   
-
+  
     
 def write_slice_params(slice_params):       
     slice_params_dump = yaml.dump(
@@ -388,7 +407,7 @@ def write_slice_params(slice_params):
 
     with open(slice_dump_filepath, "w", encoding="utf-8") as yaml_file:
         yaml_file.write(slice_params_dump)
-        print(f"Parameter slice params written to: {slice_dump_filepath}")
+        logging.info(f"Parameter slice params written to: {slice_dump_filepath}")
     return None
     
     
@@ -404,6 +423,7 @@ def create_slice_params(xl_dict):
     params_dict = xl_to_slice_params(xl_dict, slice_param_template)
     
     for tab, rows in params_dict.items():
+        set_output_paths(protocol_dir=tab)
         for row in rows.keys():
             slice_params = params_dict[tab][row]
             # print(f'slice_params {slice_params}')
@@ -430,7 +450,7 @@ def main(argv):
     xls_file = USER_PATHS[USER]["exp_xlsx"]
     col_names, tab_dict = get_xls_data(xls_file)
     # print(f'tab_dict keys: {tab_dict.keys()}')
-    print(clean_identifiers(col_names))
+    # print(clean_identifiers(col_names))
     
     create_slice_params(tab_dict)
     
