@@ -1,7 +1,7 @@
 import yaml
-import os
+from os import path
+from pathlib import Path
 from datetime import datetime
-import xlrd  ## deprecated
 import openpyxl
 import pathlib
 import re, string
@@ -10,17 +10,15 @@ from copy import deepcopy
 import logging
 
 from meappy.meappy_data import get_test_data_path
-from meappy.configuration import (USER_PATHS, USER, XL_COLS, 
-                                  COMPOSITE_ROW_ID, XLCOL, LOG_FILE,
-                                  DEFAULT_SLICE_TEMPLATE_PATH, 
-                                  DEFAULT_PROTOCOL_TEMPLATE_PATH, 
-                                  DEFAULT_SAMPLE_FIELDS)
+from meappy.configuration import (USER_PATHS, USER, XLCOL, XL_COLS, LOG_FILE,
+                                  COMPOSITE_ROW_ID)
 
 
-logging.basicConfig(format='%(levelname)s: %(asctime)s >> %(message)s', datefmt='%Y-%m-%d %I:%M:%S', 
+logging.basicConfig(format='%(levelname)s: %(asctime)s >> %(message)s', 
+                    datefmt='%Y-%m-%d %I:%M:%S', 
                     filename= LOG_FILE, 
                     encoding='utf-8', level=logging.DEBUG)
-
+    
 
 DESCRIPTION = """Create data folder and metadata from the experiment log
 
@@ -31,7 +29,7 @@ To use
 
     python /path/to/meap/meappy/meappy/parameter_yaml.py
 
-Note that to to figure setup, edit `path/to/MED64_Data/configuration.py`
+Note that to configure setup, edit `path/to/MED64_Data/configuration.py`
 
 """
 
@@ -44,12 +42,12 @@ def parse_arguments(argv):
     parser.add_argument(
         "--slice_template_path", type=str, action="store", dest="slice_template_path",
         help="""Path to slice_template.yaml to use as a template for slice paramters""",
-        default=DEFAULT_SLICE_TEMPLATE_PATH)
+        default=USER_PATHS[USER]["slice_template_path"])
 
     parser.add_argument(
         "--protocol_template_path", type=str, action="store", dest="protocol_template_path",
         help="""Path to slice_template.yaml to use as a template for protocol paramters""",
-        default=DEFAULT_PROTOCOL_TEMPLATE_PATH)
+        default=USER_PATHS[USER]["protocol_template_path"])
     
     parser.add_argument(
         "--protocol_id", type=str, action="store", dest="protocol_id",
@@ -59,7 +57,7 @@ def parse_arguments(argv):
     parser.add_argument(
         "--fields", nargs="+", type=str, action="store", dest="XL_COLS",
         help="""Select meta data fieilds for each recording (i.e. columns in a tab in the MED64_ExperimentForAnalysis.xls) (Default: XL_COLS in configuration.py)""",
-        default = DEFAULT_SAMPLE_FIELDS)
+        default = USER_PATHS[USER]["sample_fields"])
 
     parser.add_argument(
         "--sample_ids", nargs="+", type=str, action="store", dest="sample_ids",
@@ -67,42 +65,28 @@ def parse_arguments(argv):
         default = None)
 
     args = parser.parse_args()
-    
     return args
-
-
-def build_user_paths(args, user_paths=USER_PATHS):
-    if args.user not in USER_PATHS.keys():
-        raise KeyError(f"User {args.user} not in known USER_PATHS {USER_PATHS.keys()}")
-
-    user_paths = USER_PATHS[args.user]
-    user_paths["protocol_output"] = os.path.join(
-        user_paths["base"], "experiment", user.protocol)
-    user_paths["slice_template"] = os.path.join(
-        user_paths["base"], args.slice_template_path)
-    user_paths["protocol_template"] = os.path.join(
-        user_paths["base"], args.protocol_template_path)
 
 
 def set_output_paths(user=USER, user_paths=USER_PATHS, protocol_dir=r""):
     # write check for os paths
-    output_path = os.path.join(user_paths[user]["output"], r"experiment")
-    user_paths[user]["protocol_output"] = os.path.join(output_path, protocol_dir)
+    output_path = path.join(user_paths[user]["output"], r"experiment")
+    user_paths[user]["protocol_output"] = path.join(output_path, protocol_dir)
 
 
-def set_input_paths(user=USER, user_paths=USER_PATHS):
-    user_paths[user]["slice_template"] = os.path.join(
-        user_paths[user]["meap"], r"doc/parameter_examples", r"slice_parameters.yaml"
+def set_input_paths(args, user=USER, user_paths=USER_PATHS):
+    user_paths[user]["slice_template"] = path.join(
+        user_paths[user]["meap"], args.slice_template_path
     )
-    user_paths[user]["protocol_template"] = os.path.join(
-        user_paths[user]["meap"], r"doc/parameter_examples", r"protocol_parameters.yaml"
+    user_paths[user]["protocol_template"] = path.join(
+        user_paths[user]["meap"], args.protocol_template_path
     )
 
 
-def set_user(user_name, user_paths=USER_PATHS):
+def set_user(user_name, args, user_paths=USER_PATHS):
     if user_name not in user_paths:
         raise KeyError(f"User {user_name} not in known USER_PATHS {USER_PATHS.keys()}")
-    set_input_paths(user_name)
+    set_input_paths(args, user_name)
     set_output_paths(user_name)
     return user_name
 
@@ -150,7 +134,10 @@ def create_protocol_params(researchers, protocol_name):
 
 
 def mock_excel():
-    """Create mock excel row data for dev and testing.
+    """
+    Deprecated
+    
+    Create mock excel row data for dev and testing.
     Alternative code is for including widgets in Jupyter Notebooks
     """
     example_excel_row = (
@@ -179,7 +166,7 @@ def mock_excel():
         "is_exported",
         "is_sorted",
         "notes",
-    ]
+    ]  # XL_COLS
     xl = dict(zip(xl_cols, xl_row.split("\t")))
     # pprint(xl.items())
     return xl
@@ -212,6 +199,14 @@ def check_xl_col_names(col_names, raw_columns):
     return None
 
 
+def filter_protocol_ids(protocol_ids):
+    """
+    how to create a generator from a generator?
+    """
+    print(protocol_ids)
+    return True
+
+
 def read_xl_wb_indices(wb):
     """
     Column names will be checked against each other tab to verify column name 
@@ -223,6 +218,7 @@ def read_xl_wb_indices(wb):
     for tab in wb.sheetnames:
         if tab == 'Index':
             continue
+        
         sheet_data = wb[tab]
         new_col_names = sheet_data['1']
         if col_names is None:
@@ -294,6 +290,12 @@ def get_xls_data(xls_file):
     
 
 def alphanum(str):
+    """
+    Arg: string
+    Returns: string, composed of only alphanumeric and underscore. This is used to 
+    create code identifiers and filenames from human readable strings by removing 
+    special characters and spaces.
+    """
     pattern = re.compile('[\W]+') 
     return pattern.sub('', str.lower().replace("/", "_")
                        .replace("#", "").strip().replace(" ", "_"))
@@ -306,10 +308,6 @@ def clean_identifiers(name_list):
     """
     clean_list = [alphanum(str) for str in name_list]
     return clean_list
-    
-    
-def log_error(error_message):
-    print(f'ERROR FOR FILE: {error_message}')
     
         
 def read_xl_row(row_name, tab_name, xl, slice_params):
@@ -376,8 +374,6 @@ def xl_to_slice_params(xl_dict, slice_param_template):
             except Exception as e:
                 error_message = (f'Date/Time format error in ' + \
                                  f'tab: {tab_name}, row: {row_name}, {e}')
-                log_error(e)
-                log_error(error_message)
                 logging.error(e)
                 logging.error(error_message)
                 continue
@@ -432,8 +428,11 @@ def create_slice_params(xl_dict):
 
     
 def test_square():
-   n = 2
-   assert n*n == 4
+    """
+    testing package example
+    """
+    n = 2
+    assert n*n == 4
     
 
 def main(argv):
@@ -444,7 +443,7 @@ def main(argv):
     args = parse_arguments(argv)
     print(f'ARGS: {args}')
     
-    user = set_user(USER)
+    user = set_user(USER, args)  # this functionality moved to parse_arguments()
     
     ## new to get all files
     xls_file = USER_PATHS[USER]["exp_xlsx"]
@@ -452,8 +451,10 @@ def main(argv):
     # print(f'tab_dict keys: {tab_dict.keys()}')
     # print(clean_identifiers(col_names))
     
-    create_slice_params(tab_dict)
     
+    
+    create_slice_params(tab_dict)
+        
 
 if __name__ == "__main__":
     main(sys.argv)
