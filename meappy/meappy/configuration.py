@@ -4,37 +4,62 @@ from os import path
 from pathlib import Path
 
 
-_HOME = Path.home()
+# System relative paths
 # examples of home paths for Windows and Mac OS:
 # C:\Users\\fieldslab2\
 # /Users/walter
-
+_HOME = Path.home()
 meappy_path = Path( __file__ ).parent.absolute()
 meap_path = meappy_path.parent.parent.absolute()
-base_path = meap_path.parent.absolute()
-data_base_path = path.join(_HOME, 'Data')
-        # /med64/experiment/VTA_NMDA/20211005_17h33m55s
-    
-params_examples = path.join(meap_path, 'doc/parameter_examples/')  # for out-of-box examples using github repo
-params_path = path.join(data_base_path, 'meap/experiment_log')
+# meap_parent_path = meap_path.parent.absolute()
 
-# box shared directory
-box_base_path = path.join(_HOME, '/Library/CloudStorage/Box-Box')
-box_output_path = path.join(box_base_path, 'meap_output')
+meap_parent_path = Path( __file__ ).parent.parent.parent.parent.absolute()
+
+# Data dir relative path
+data_path = path.join(_HOME, 'Data')
+        # example:  /med64/experiment/VTA_NMDA/20211005_17h33m55s
+experiment_xls_path = path.join(data_path, 'meap/experiment_log')
+LOG_FILE = path.join(data_path, 'meap/experiment/log_file.txt') 
+
+# Repo dir relative paths
+params_examples = path.join(meap_path, 'doc/parameter_examples/')  # for out-of-box examples using github repo
+
+# box shared directory paths
+box_path = path.join(_HOME, '/Library/CloudStorage/Box-Box')
+box_output_path = path.join(box_path, 'meap_output')
 
 expt_xl_file = 'MED64_ExperimentsForAnalysis.xlsx'
 
-# These configuration files can be set up for each computer
-# use python dataclasses
+PARAM_TEMPLATE_DIR = r"doc/parameter_examples"
+SLICE_PARAM_TEMPLATE = r"slice_parameters.yaml"
+PROTOCOL_PARAM_TEMPLATE = r"protocol_parameters.yaml"
+
+## for parse_arguments()
+# DEFAULT_SLICE_TEMPLATE_PATH = path.join(PARAM_TEMPLATE_DIR, SLICE_PARAM_TEMPLATE)
+# DEFAULT_PROTOCOL_TEMPLATE_PATH = path.join(PARAM_TEMPLATE_DIR, PROTOCOL_PARAM_TEMPLATE)
+# DEFAULT_SAMPLE_FIELDS = ""  # select by field and value. examples: date=20200101, cut_by@AS
+
+
+# These configuration paths can be set for specific computers. The default path will 
+# write to directories relative to the home directory of the user, or relative to the 
+# location of the MEAP git repo used to run the code.
+
+
+USER = "default"
+
 USER_PATHS = {
-    "meappy_data": {
-        "base": base_path,
+    "default": {
         "meap": meap_path,
-        "output": path.join(data_base_path, 'meap'),  # path.join(base_path, 'meap_output'),
-        "exp_xlsx": path.join(params_path, expt_xl_file), # path.join(params_path, expt_xl_file), 
-        "params_template": params_path,
-        "data_dir": path.join(data_base_path, 'med64/experiment/VTA_NMDA/20211005_17h33m55s'),
-        "phy_export": path.join(data_base_path, 'meap/experiment'),
+        "output": path.join(data_path, 'meap'),  
+        "exp_xlsx": path.join(experiment_xls_path, expt_xl_file), 
+        "data_dir": path.join(data_path, 'med64/experiment/VTA_NMDA/20211005_17h33m55s'),
+        "phy_export": path.join(data_path, 'meap/experiment'),
+        ## for parse_arguments()
+        "slice_template_path": path.join(PARAM_TEMPLATE_DIR, SLICE_PARAM_TEMPLATE),
+        "protocol_template_path": path.join(PARAM_TEMPLATE_DIR, PROTOCOL_PARAM_TEMPLATE),
+        "sample_fields": None, # select by field and value. examples: date=20200101, cut_by@AS
+        "protocol_ids": None, # select specific protocol ids to process
+        "log_file": LOG_FILE,
     },
     "elayne": {
         "meap": r"C:\Users\fieldslab2\Desktop\Lab\MatLab\Python_Code\meap",
@@ -44,14 +69,6 @@ USER_PATHS = {
         "product_dir": r"C:\Users\\fieldslab2\\Desktop\\Lab\\MatLab\\MED64_Data\\product\\",
     },
 }
-
-USER = "meappy_data"  #"walter"  #  'elayne'  # walter_box
-COMPOSITE_ROW_ID = ('Date', 'Slice #')  # These are column names of row info used to create composite row_id
-
-LOG_FILE = '/Users/walter/Data/meap/experiment/log_file.txt'
-
-
-# [('date', 'Date'), ('cut_by', 'Cut by'), ('run_by', 'Run by'), ('region', 'Recording  Region'), ('project', 'Slice Location'), ('experiment_type', 'Project'), ('drugs_dose_used', 'Experiment Type'), ('vendor_batch', 'Drugs Used'), ('slice_time', 'Vendor/Batch'), ('is_photo_saved', 'Slice #'), ('notes_issues', 'Photo saved'), ('is_exported', 'Notes/Problems/Issues'), ('is_sorted', 'Exported?'), ('notes', 'Analyzed?')]
 
 
 XLCOL = {'date': 'date',
@@ -69,47 +86,8 @@ XLCOL = {'date': 'date',
     'is_exported': 'exported',
     'is_sorted': 'analyzed',
     'notes': 'notes'
-}
+}  #  (name used in parameter yaml files): (col name in xls file; spaces replaced with underscores)
 
+XL_COLS = list(XLCOL.keys())
 
-XL_COLS = [
-    "date",
-    "cut_by",
-    "run_by",
-    "region",
-    "slice_location",
-    "project",
-    "experiment_type",
-    "drugs_dose_used",
-    "vendor_batch",
-    "slice_time",
-    "is_photo_saved",
-    "notes_issues",
-    "is_exported",
-    "is_sorted",
-    "notes",
-]
-
-
-# Analysis Paths
-# for v1 NWB file format
-protocol_dir = r"HB_139_DAMGO"
-slice_dir = r"825_12h24m37s"  # '20200825_12h24m37s'
-
-# use empty strings for data v0 format
-# protocol_dir = '' #r'HB_139_DAMGO'
-# slice_dir = '' #r'825_12h24m37s'  # '20200825_12h24m37s'
-
-
-## QQ configurations
-# what do I need the params for?
-# old: /Users/walter/Data/med64/experiment/VTA_NMDA/20211005_17h33m55s
-
-############
-# NEXT.... #
-############
-
-## for parse_arguments()
-DEFAULT_SLICE_TEMPLATE_PATH = ""
-DEFAULT_PROTOCOL_TEMPLATE_PATH = "" 
-DEFAULT_SAMPLE_FIELDS = ""
+COMPOSITE_ROW_ID = ('Date', 'Slice #')  # These are column names of row info used to create composite row_id
