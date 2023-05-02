@@ -2,7 +2,7 @@ Package: meapr
 Type: Package
 Version: 0.0.0.9000
 Title: Multi-Electrode Array Pharmacology
-Description: MED64 elecrophysiology data for pharamcology.
+Description: Analyze MED64 Electrophysiology Data for Pharmacology
 Authors@R: c(
   person(
     given = "Matthew",
@@ -10,34 +10,46 @@ Authors@R: c(
     email = "maom@umich.edu",
     role = c("aut", "cre")),
   person(
+    given = "Walter",
+    family = "German",
+    email = "p.walter.german@gmail.com",
+    role = c("aut")),
+  person(
     given = "Madeline",
     family = "Martin",
     email = "mmarti29@uoregon.edu",
     role = c("aut")))
+URL: https://github.com/eb-margolis-neuroscience-lab/meap/tree/main/meapr/
 Depends: 
-    R (>= 4.0.0),
-    Rcpp
+    R (>= 4.0.0)
 Imports: 
-    assertthat,
     brms,
     dplyr,
+    fuzzyjoin,
     GGally,
     ggplot2,
     gplots,
-    knitr,
     magrittr,
     plyr,
     purrr,
     readr,
     reshape2,
+    reticulate,
+    rlang,
     R.matlab,
-    fuzzyjoin,
+    scales,
     seriation,
+    shiny,
     stringr,
+    tibble,
     tidyr,
     viridis
 License: MIT + file LICENSE
-Collage: 'load_firing_data.R'
+Collage:
+    'load-treatments-file.R'
+    'load-experiment-matlab.R'
+    'load-experiment-spyking_circus.R'
+    'meapr-experiment.R'
     'model_treatment_log_poisson.R'
     'plot_model_marginal_effects.R'
     'plot_firing_density_by_neuron.R'
@@ -54,7 +66,9 @@ Collage: 'load_firing_data.R'
     'filter_treatment_add_log_dose.R'
     'plot_responsive_Hz.R'
 RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Suggests: knitr,
     rmarkdown
+Config/testthat/edition: 3
 VignetteBuilder: knitr

@@ -11,3 +11,5 @@ demo/pandas
 ^README\.Rmd$
 ^revdep$
 ^README-.*\.png$
+^\.lintr$
+^Makefile$

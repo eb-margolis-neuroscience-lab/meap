@@ -9,23 +9,29 @@ plot_waveform_lattice(
   plot_width = 10,
   plot_height = 10,
   output_base = "product/plots",
-  verbose = TRUE
+  verbose = FALSE
 )
+}
+\arguments{
+\item{experiment}{\link{meapr-experiment} data set loaded with
+\link{load_experiment_matlab} or \link{load_experiment_spyking_circus}}
+
+\item{plot_width}{\code{numeric} width of the output plot}
+
+\item{plot_height}{\code{numeric} height of the output plot}
+
+\item{verbose}{\code{logical} print out verbose output}
+}
+\value{
+: \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
+\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.pdf}
+and
+\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.png}
+It save both .pdf and .png because it's easier to email etc small pngs
+while for use in an a manuscript having the vector version means that it`
+can be tweaked with illustrator
 }
 \description{
 Plot a grid of plots, with x-axis in microseconds and y-axis in voltage
-  One for each waveform in the waveform data.frame
-}
-\details{
-experiment:
-  experiment dataset loaded with mema::load_experiment(...)
-
-plot_width/plot_height:
-  dimensions of the output plot
-
-returns:
-  the ggplot2
-  Saves the result to product/plots/waveform_lattice_<experiment_tag>_<date_code>.(pdf|png)
-  It save both .pdf and .png because it's easier to email etc small pngs
-  while for use in an a manuscript having the vector version means that it can be tweaked with illustrator
+One for each waveform in the waveform data.frame
 }

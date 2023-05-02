@@ -2,34 +2,40 @@
 % Please edit documentation in R/plot_firing_rate_by_neuron.R
 \name{plot_firing_rate_by_neuron}
 \alias{plot_firing_rate_by_neuron}
-\title{Firing rate by neuron}
+\title{Firing Rate by Neuron}
 \usage{
 plot_firing_rate_by_neuron(
   experiment,
   plot_width = 7,
   plot_height = 4,
   output_base = "product/plots",
-  verbose = TRUE
+  verbose = FALSE
 )
+}
+\arguments{
+\item{experiment}{\link{meapr-experiment} data set loaded with
+\link{load_experiment_matlab} or \link{load_experiment_spyking_circus}}
+
+\item{plot_width}{\code{numeric} width of the output plot}
+
+\item{plot_height}{\code{numeric} height of the output plot}
+
+\item{verbose}{\code{logical} print out verbose output}
+}
+\value{
+: \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
+\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.(pdf|png)}
+It save both .pdf and .png because it's easier to email etc small pngs
+while for use in an a manuscript having the vector version means that it`
+can be tweaked with illustrator
 }
 \description{
 histogram of average firing rate
-    x-axis firing rate on the log-scale
-    y-axis number of neurons in the histogram bin
+x-axis firing rate on the log-scale
+y-axis number of neurons in the histogram bin
 }
 \details{
 if there is spread in the average firing rate then this variation should be
- accounted for in a model of effects of the treatment on the average firing rate
-
-experiment:
-  experiment dataset loaded with mema::load_experiment(...)
-
-plot_width/plot_height:
-  dimensions of the output plot
-
-returns:
-  the ggplot2
-  Saves the result to product/plots/firing_rate_by_neuron_<experiment_tag>_<date_code>.(pdf|png)
-  It save both .pdf and .png because it's easier to email etc small pngs
-  while for use in an a manuscript having the vector version means that it can be tweaked with illustrator
+accounted for in a model of effects of the treatment on the average firing
+rate
 }

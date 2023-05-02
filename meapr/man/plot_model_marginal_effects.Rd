@@ -2,8 +2,7 @@
 % Please edit documentation in R/plot_model_marginal_effects.R
 \name{plot_model_marginal_effects}
 \alias{plot_model_marginal_effects}
-\title{plot_width/plot_height:
-  dimensions of the output plot}
+\title{Plot Model Conditional Effects}
 \usage{
 plot_model_marginal_effects(
   model_fit,
@@ -11,14 +10,26 @@ plot_model_marginal_effects(
   plot_width = 6,
   plot_height = 6,
   output_base = "product/plots",
-  verbose = TRUE,
+  verbose = FALSE,
   ...
 )
 }
+\arguments{
+\item{model_fit}{\link[brms:brmsfit-class]{brms::brmsfit} model object}
+
+\item{plot_width}{\code{numeric} width of the output plot}
+
+\item{plot_height}{\code{numeric} height of the output plot}
+
+\item{verbose}{\code{logical} print out verbose output}
+}
+\value{
+: \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
+\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.(pdf|png)}
+It save both .pdf and .png because it's easier to email etc small pngs
+while for use in an a manuscript having the vector version means that it`
+can be tweaked with illustrator
+}
 \description{
-returns:
-  the ggplot2
-  Saves the result to product/plots/firing_rate_by_neuron_<experiment_tag>_<date_code>.(pdf|png)
-  It save both .pdf and .png because it's easier to email etc small pngs
-  while for use in an a manuscript having the vector version means that it can be tweaked with illustrator
+Plot Model Conditional Effects
 }

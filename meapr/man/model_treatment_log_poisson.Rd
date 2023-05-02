@@ -2,38 +2,41 @@
 % Please edit documentation in R/model_treatment_log_poisson.R
 \name{model_treatment_log_poisson}
 \alias{model_treatment_log_poisson}
-\title{Model average firing as a function treatment using log-poisson regression}
+\title{Model Average Firing rate as a Function of Treatment Using Log-Poisson
+Regression}
 \usage{
 model_treatment_log_poisson(
   experiment,
   output_base = "intermediate_data/models",
-  verbose = TRUE,
+  verbose = FALSE,
   ...
 )
 }
-\description{
-experiment:
-  experiment dataset loaded with mema::load_experiment(...)
+\arguments{
+\item{experiment}{\link{meapr-experiment} data set loaded with
+\link{load_experiment_matlab} or \link{load_experiment_spyking_circus}}
+
+\item{output_base}{\code{characeter} path where the model should be saved. The
+output file is \verb{<output_base>/model_log_poisson_<experiment$tag>.stan}}
+
+\item{verbose}{\code{logical} print out verbose output}
+
+\item{...arguments}{are passed to \link[brms:brm]{brms::brm}}
 }
-\details{
-extra ... arguments are passed to brms::brm(...)
+\value{
+\link[brms:brmsfit-class]{brms::brmsfit} object with the fit model
+}
+\description{
+Build a Bayesian hierarchical model for the firing rate
+as a function of the treatment and other covariates. This uses log-poisson
+regression which  directly estimates the number of firing events with
+taking into account the exposure.
 
-returns:
-  brmsfit from the brms package
+treatment as a fixed effect
+=> treatment
 
-Build a bayesian heirarchical model for the number of firings as a function of
+average neuron firing rate as a random effet
+=> (1|neuron_index)
 
- exposure with a weight fixed at 1
-   => offset(log(exposure))
-   https://github.com/paul-buerkner/brms/issues/146
-
- treatment as a fixed effect
-   => treatment
-
- average neuron firing rate as a random effet
-   => (1|neuron_index)
-
- assume a general linear model with log-poisson link
-
-This uses the brms package front end to the stan bayesian modeling framework
+assume a general linear model with log-poisson link
 }
