@@ -38,28 +38,28 @@ plot_firing_density_by_neuron <- function(
         adjust = .01,
         n = 1000)
       tibble::tibble(
-  time_step = density_estimate$x,
-  firing_density = density_estimate$y) |>
-  dplyr::mutate(
-    normalized_log_firing_density =
-      log(firing_density / max(firing_density) + 1))
+        time_step = density_estimate$x,
+        firing_density = density_estimate$y) |>
+        dplyr::mutate(
+        normalized_log_firing_density =
+          log(firing_density / max(firing_density) + 1))
     })
 
   p <- ggplot2::ggplot(data = data) +
     ggplot2::theme_bw() +
     ggplot2::geom_tile(
       mapping = ggplot2::aes(
-  x = time_step,
-  y = neuron_index,
-  fill = normalized_log_firing_density)) +
+        x = time_step,
+        y = neuron_index,
+        fill = normalized_log_firing_density)) +
     ggplot2::geom_rect(
       data = experiment$treatments,
       mapping = ggplot2::aes(
-  xmin = begin,
-  xmax = end,
-  ymin = -Inf,
-  ymax = Inf,
-  group = treatment),
+        xmin = begin,
+        xmax = end,
+        ymin = -Inf,
+        ymax = Inf,
+        group = treatment),
       color = "white",
       alpha = 0) +
     ggplot2::ggtitle(
@@ -83,12 +83,12 @@ plot_firing_density_by_neuron <- function(
   if (!is.null(output_base)) {
     if (!dir.exists(output_base)) {
       if (verbose) {
-  cat("creating output directory '", output_base, "'\n", sep = "")
+        cat("creating output directory '", output_base, "'\n", sep = "")
       }
       dir.create(
-  output_base,
-  showWarnings = FALSE,
-  recursive = TRUE)
+        output_base,
+        showWarnings = FALSE,
+        recursive = TRUE)
     }
 
     pdf_path <- paste0(
@@ -96,8 +96,8 @@ plot_firing_density_by_neuron <- function(
       "_", date_code(), ".pdf")
     if (verbose) {
       cat(
-  "Saving firing density by neuron plot for experiment ",
-  "'", experiment$tag, "' to '", pdf_path, "'\n", sep = "")
+        "Saving firing density by neuron plot for experiment ",
+        "'", experiment$tag, "' to '", pdf_path, "'\n", sep = "")
     }
     ggplot2::ggsave(
       pdf_path,
@@ -109,8 +109,8 @@ plot_firing_density_by_neuron <- function(
       "_", date_code(), ".png")
     if (verbose) {
       cat(
-  "Saving firing density by neuron plot for experiment ",
-  "'", experiment$tag, "' to '", png_path, "'\n", sep = "")
+        "Saving firing density by neuron plot for experiment ",
+        "'", experiment$tag, "' to '", png_path, "'\n", sep = "")
     }
     ggplot2::ggsave(
       png_path,

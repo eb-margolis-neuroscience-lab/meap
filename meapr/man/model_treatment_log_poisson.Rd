@@ -35,7 +35,7 @@ taking into account the exposure.
 treatment as a fixed effect
 => treatment
 
-average neuron firing rate as a random effet
+average neuron firing rate as a random effect
 => (1|neuron_index)
 
 assume a general linear model with log-poisson link

@@ -91,7 +91,7 @@ load_experiment_spiking_circus <- function(
   }
   
   firing_data <- tibble::tibble(
-    neuron_id = spike_clusters <- np$load(
+    neuron_index = spike_clusters <- np$load(
       paste0(data_path, "/spike_clusters.npy")),
     template_id = spike_templates <- np$load(
       paste0(data_path, "/spike_templates.npy")),
@@ -107,12 +107,25 @@ load_experiment_spiking_circus <- function(
     file = paste0(data_path, "/cluster_info.tsv"),
     show_col_types = FALSE) |>
     dplyr::rename(
-      neuron_id = cluster_id)
+      neuron_inded = cluster_id)
 
   if (verbose) {
     cat(
       "  Found data for ", nrow(cluster_data), " waveform clusters\n",
       sep = "")
+  }
+  
+  # if there is final end to treatment assume it is millisecond past at the last
+  # firing event or the beginning of the last treatment (which ever is greater)
+  if (is.na(treatments$end[nrow(treatments)])) {
+    treatments$end[nrow(treatments)] <- max(
+      treatments$begin[nrow(treatments)] + 0.0001,
+      firing_data$time_step + 0.0001)
+    if (verbose) {
+      cat(
+      "  Since there is no end to the final treatment, setting it past the ",
+      " final firing event.", sep = "")
+    }
   }
   
   if (!is.null(treatments)) {

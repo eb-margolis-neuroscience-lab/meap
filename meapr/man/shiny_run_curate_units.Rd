@@ -15,7 +15,7 @@ Usage:
 \item Unit --> Firing pattern
 \itemize{
 \item Select a unit from a list or small-multiples plot
-\item hilight firing rate of unit in plots
+\item Highlight firing rate of unit in plots
 \itemize{
 \item Average firing rate of unit across treatments
 \item Firing density across the experiment duration

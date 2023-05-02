@@ -39,13 +39,13 @@ the left endpoint anchored at the lower left
 the right endpoint anchored at the upper right
 }
 \details{
-If the counts occur independently through time as is assumed in a poisson
+If the counts occur independently through time as is assumed in a Poisson
 process model then for each neuron, the line be diagonal (following the
 guide blue line)
 \itemize{
 \item If there is some lag to reach a stead state then the lines will look
 like they have a kink in it
-\item if there is bursty or irregular spacing, then the spead off the diagonal
-will be substantial but symmetric
+\item if there is bursty or irregular spacing, then the spread off the
+diagonal will be substantial but symmetric
 }
 }

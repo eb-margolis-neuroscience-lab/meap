@@ -31,8 +31,12 @@ can be tweaked with illustrator
 }
 \description{
 Make a plot where
-the x-axis are the treatments and
-the y-axis is the average firing rate on the log scale
-show a box (and wisker) plot for each treatment summarizing across neurons in the experiment
-overlay points for each neuron jittering horizontally to allow them to be seen more easily
+\itemize{
+\item the x-axis are the treatments and
+\item the y-axis is the average firing rate on the log scale
+\item show a box (and whisker) plot for each treatment summarizing across
+neurons in the experiment
+\item overlay points for each neuron jittering horizontally to allow them to
+be seen more easily
+}
 }
