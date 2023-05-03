@@ -12,7 +12,7 @@
 #'   can be tweaked with illustrator
 #'
 #'@export
-plot_model_marginal_effects <- function(
+plot_model_conditional_effects <- function(
   model_fit,
   model_tag,
   plot_width = 6,
@@ -21,7 +21,7 @@ plot_model_marginal_effects <- function(
   verbose = FALSE,
   ...) {
 
-  marginal_effects <- brms::marginal_effects(model_fit, ...)
+  marginal_effects <- brms::conditional_effects(model_fit, ...)
 
   p <- plot(
     marginal_effects,
