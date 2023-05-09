@@ -6,7 +6,7 @@
 \usage{
 plot_stable_baseline(
   experiment,
-  baseline_treatment_name = "Baseline",
+  baseline_treatment_name = "baseline",
   plot_width = 10,
   plot_height = 4,
   output_base = "product/plots",
