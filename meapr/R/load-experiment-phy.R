@@ -95,6 +95,22 @@ load_experiment_phy <- function(
     cat("  Found data for ", nrow(electrode_data), " electrodes\n", sep = "")
   }
   
+  # cluster_group.csv and cluster_purity.csv are already in cluster_info.tsv
+  neuron_data <- readr::read_tsv(
+    file = paste0(data_path, "/cluster_info.tsv"),
+    show_col_types = FALSE) |>
+    dplyr::rename(
+      neuron_index = cluster_id)
+  
+  if (verbose) {
+    n_good <- neuron_data |> dplyr::filter(group == "good") |> nrow()
+    n_noise <- neuron_data |> dplyr::filter(group == "noise") |> nrow()
+    cat(
+      "  Found data for ", n_good, " good neurons and ", n_noise,
+      " noise clusters\n",
+      sep = "")
+  }  
+  
   firing_data <- tibble::tibble(
     neuron_index = spike_clusters <- np$load(
       paste0(data_path, "/spike_clusters.npy")),
@@ -103,21 +119,24 @@ load_experiment_phy <- function(
     time_step = np$load(paste0(data_path, "/spike_times.npy")) / 20000,
     amplitude = np$load(paste0(data_path, "/amplitudes.npy")))
 
+  firing_data_noise <- firing_data |>
+    dplyr::semi_join(
+      neuron_data |>
+        dplyr::filter(group == "noise"),
+      by = "neuron_index")
+  
+  firing_data <- firing_data |>
+    dplyr::semi_join(
+      neuron_data |>
+        dplyr::filter(group == "good"),
+      by = "neuron_index")
+  
   if (verbose) {
-    cat("  Found data for ", nrow(firing_data), " firing events\n", sep = "")
-  }
-
-  # cluster_group.csv and cluster_purity.csv are already in cluster_info.tsv
-  neuron_data <- readr::read_tsv(
-    file = paste0(data_path, "/cluster_info.tsv"),
-    show_col_types = FALSE) |>
-    dplyr::rename(
-      neuron_inded = cluster_id)
-
-  if (verbose) {
+    n_good <- firing_data |> nrow()
+    n_noise <- firing_data_noise |> nrow()
     cat(
-      "  Found data for ", nrow(neuron_data), " waveform clusters\n",
-      sep = "")
+      "  Found data for ", n_good, " firing events in good neurons and ",
+      n_noise, " firing events in noise clusters\n", sep = "")
   }
   
   # if there is final end to treatment assume it is millisecond past at the last
@@ -139,6 +158,11 @@ load_experiment_phy <- function(
         treatments,
         by = c("time_step" = "begin", "time_step" = "end"),
         match_fun = list(`>=`, `<`))
+    firing_data_noise <- firing_data_noise |>
+      fuzzyjoin::fuzzy_inner_join(
+        treatments,
+        by = c("time_step" = "begin", "time_step" = "end"),
+        match_fun = list(`>=`, `<`))
   } else {
     if (verbose) {
       cat("Didn't load any treatment information because treatment is NULL\n")
@@ -148,9 +172,10 @@ load_experiment_phy <- function(
   experiment <- list(
     tag = experiment_tag,
     treatments = treatments,
-    firing = firing_data,
     electrode = electrode_data,
-    waveform = neuron_data,
+    neuron = neuron_data,
+    firing = firing_data,
+    firing_noise = firing_data_noise,
     spike_sorter = "phy") |>
     structure(class = "meapr_experiment")
   
