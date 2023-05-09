@@ -3,6 +3,8 @@
 #' @param experiment [meapr-experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_spyking_circus]
 #' @param baseline_treatment_name `character` name of the baseline treatment
+#' @param event_reshold `numeric` how many events should be used to set the
+#'   baseline treshold
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot
 #' @param verbose `logical` print out verbose output.
@@ -20,6 +22,7 @@
 plot_stable_baseline <- function(
     experiment,
     baseline_treatment_name = "baseline",
+    event_threshold = 200,
     plot_width = 10,
     plot_height = 4,
     output_base = "product/plots",
@@ -37,14 +40,28 @@ plot_stable_baseline <- function(
     "end"] |>
     as.numeric()
 
+  thresholds <- experiment$firing |>
+    dplyr::filter(time_step < baseline_end) |>
+    dplyr::group_by(neuron_index) |>
+    dplyr::mutate(total_events = dplyr::n()) |>
+    dplyr::arrange(dplyr::desc(time_step)) |>
+    dplyr::slice_head(n = event_threshold) |>
+    dplyr::summarize(
+      threshold = ifelse(
+        total_events[1] > event_threshold,
+        min(time_step),
+        -Inf),
+      .groups = "drop")
+  
   data <- tibble::tibble(
     begin = seq(
       from = 0,
       to = baseline_end,
-      length.out = 300),
+      length.out = 500),
     end = baseline_end) |>
     dplyr::rowwise() |>
     dplyr::do({
+
       baseline <- .
       experiment$firing |>
         dplyr::filter(
@@ -54,20 +71,24 @@ plot_stable_baseline <- function(
         dplyr::summarize(
           baseline_begin = baseline$begin[1],
           baseline_end = baseline$end[1],
-          firing_rate = dplyr::n() / (baseline$end[1] - baseline$begin[1])) |>
-        dplyr::ungroup()
+          firing_rate = dplyr::n() / (baseline$end[1] - baseline$begin[1]),
+          .groups = "drop") |>
+        dplyr::left_join(thresholds, by = "neuron_index") |>
+        dplyr::mutate(keep = baseline_begin >= threshold)
     })
+  
   p <- ggplot2::ggplot(data = data) +
     ggplot2::theme_bw() +
-    ggplot2::geom_smooth(
+    ggplot2::geom_hline(
+      yintercept = 0.5,
+      color = "lightgray",
+      size = 2) +
+    ggplot2::geom_line(
       mapping = ggplot2::aes(
         x = baseline_begin,
         y = firing_rate,
-        group = neuron_index,
-        color = neuron_index),
-      method = "gam",
-      formula = y ~ s(x, bs = "cs", k=50),
-      se = FALSE) +
+        group = paste(neuron_index, keep),
+        color = keep)) +
     ggplot2::ggtitle(
       "Firing Rate by Baseline Duration",
       subtitle = experiment$tag) +

@@ -13,8 +13,8 @@ load_experiment_phy(
 )
 }
 \arguments{
-\item{data_path}{\code{character} path to SpyKING Circus data path. It should be
-a directory with the output of running SpyKING Circus spike sorter, usually
+\item{data_path}{\code{character} path to phy data path. It should be
+a directory with the output of running phy spike sorter, usually
 with an extension of \code{.modat.GUI}.}
 
 \item{treatments}{\code{data.frame} or \code{character}. See \link{load_treatments_file}
@@ -43,6 +43,7 @@ each detected firing}
 }
 \description{
 (Phy)\link{https://github.com/cortex-lab/phy} is a data exchange
-framework for electrophysiology data. This will load data from the export in
-the \verb{*.modat.GUI/} folder
+framework for electrophysiology data. For example, the SpyKING Circus spike
+sorter data can be exported in phy format. This function will load data from
+the export in the \verb{*.modat.GUI/} folder
 }

@@ -7,6 +7,7 @@
 plot_stable_baseline(
   experiment,
   baseline_treatment_name = "baseline",
+  event_threshold = 200,
   plot_width = 10,
   plot_height = 4,
   output_base = "product/plots",
@@ -24,6 +25,9 @@ plot_stable_baseline(
 \item{plot_height}{\code{numeric} height of the output plot}
 
 \item{verbose}{\code{logical} print out verbose output.}
+
+\item{event_reshold}{\code{numeric} how many events should be used to set the
+baseline treshold}
 }
 \value{
 : \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
