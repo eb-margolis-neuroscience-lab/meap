@@ -1,10 +1,15 @@
-#'Load Firing Data for an Experiment from SpyKING Circus
+#'Load Firing Data for an Experiment from phy
+#'
+#'@description (Phy)[https://github.com/cortex-lab/phy] is a data exchange
+#' framework for electrophysiology data. For example, the SpyKING Circus spike
+#' sorter data can be exported in phy format. This function will load data from
+#' the export in the `*.modat.GUI/` folder
 #'
 #' @param treatments `data.frame` or `character`. See [load_treatments_file]
 #'   for details.
 #'
-#' @param data_path `character` path to SpyKING Circus data path. It should be
-#'   a directory with the output of running SpyKING Circus spike sorter, usually
+#' @param data_path `character` path to phy data path. It should be
+#'   a directory with the output of running phy spike sorter, usually
 #'   with an extension of `.modat.GUI`.
 #'
 #' @param experiment_tag `character` an identifier for the experiment, set
@@ -27,7 +32,7 @@
 #'   }
 #'
 #'@export
-load_experiment_spiking_circus <- function(
+load_experiment_phy <- function(
     data_path,
     treatments,
     experiment_tag = NULL,
@@ -57,7 +62,7 @@ load_experiment_spiking_circus <- function(
   }
 
   if (verbose) {
-    cat("Reading in SpyKING Circus data from '", data_path, "' ...\n", sep = "")
+    cat("Reading in phy data from '", data_path, "' ...\n", sep = "")
   }
 
   if (!stringr::str_detect(data_path, ".modat.GUI$")) {
@@ -111,7 +116,7 @@ load_experiment_spiking_circus <- function(
 
   if (verbose) {
     cat(
-      "  Found data for ", nrow(cluster_data), " waveform clusters\n",
+      "  Found data for ", nrow(neuron_data), " waveform clusters\n",
       sep = "")
   }
   
@@ -145,8 +150,8 @@ load_experiment_spiking_circus <- function(
     treatments = treatments,
     firing = firing_data,
     electrode = electrode_data,
-    waveform = cluster_data,
-    spike_sorter = "SpyKING Circus") |>
+    waveform = neuron_data,
+    spike_sorter = "phy") |>
     structure(class = "meapr_experiment")
   
   if (!is.null(save_path)) {

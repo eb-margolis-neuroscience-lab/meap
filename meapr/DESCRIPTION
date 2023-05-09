@@ -44,11 +44,15 @@ Imports:
     tibble,
     tidyr,
     viridis
+Suggests:
+    knitr,
+    rmarkdown,
+    tidyverse
 License: MIT + file LICENSE
 Collage:
     'load-treatments-file.R'
     'load-experiment-matlab.R'
-    'load-experiment-spyking_circus.R'
+    'load-experiment-phy.R'
     'meapr-experiment.R'
     'model_treatment_log_poisson.R'
     'plot_model_conditional_effects.R'
@@ -69,7 +73,5 @@ Collage:
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
-Suggests: knitr,
-    rmarkdown
 Config/testthat/edition: 3
 VignetteBuilder: knitr
