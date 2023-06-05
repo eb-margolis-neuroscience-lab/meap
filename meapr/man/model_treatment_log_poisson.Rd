@@ -14,9 +14,9 @@ model_treatment_log_poisson(
 }
 \arguments{
 \item{experiment}{\link{meapr-experiment} data set loaded with
-\link{load_experiment_matlab} or \link{load_experiment_spyking_circus}}
+\link{load_experiment_matlab} or \link{load_experiment_phy}}
 
-\item{output_base}{\code{characeter} path where the model should be saved. The
+\item{output_base}{\code{character} path where the model should be saved. The
 output file is \verb{<output_base>/model_log_poisson_<experiment$tag>.stan}}
 
 \item{verbose}{\code{logical} print out verbose output}

@@ -49,27 +49,6 @@ Suggests:
     rmarkdown,
     tidyverse
 License: MIT + file LICENSE
-Collage:
-    'load-treatments-file.R'
-    'load-experiment-matlab.R'
-    'load-experiment-phy.R'
-    'meapr-experiment.R'
-    'model_treatment_log_poisson.R'
-    'plot_model_conditional_effects.R'
-    'plot_firing_density_by_neuron.R'
-    'plot_firing_rate_by_neuron.R'
-    'plot_firing_rate_by_treatment.R'
-    'plot_firing_qqplot_by_treatment.R'
-    'plot_lines_firing_rate_by_treatment.R'
-    'plot_stable_baseline.R'
-    'plot_waveform_correlation_matrix.R'
-    'plot_waveform_lattice.R'
-    'plot_unit_response_correlaiton_by_treatment.R'
-    'scales.R'
-    'r_utils.R'
-    'clean_normalize_label_data.R'
-    'filter_treatment_add_log_dose.R'
-    'plot_responsive_Hz.R'
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8

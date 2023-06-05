@@ -8,6 +8,7 @@ load_experiment_phy(
   data_path,
   treatments,
   experiment_tag = NULL,
+  time_steps_per_second = 1,
   save_path = "intermediate_data/experiment_datasets",
   verbose = FALSE
 )

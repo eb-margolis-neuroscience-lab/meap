@@ -9,10 +9,12 @@
 #'  rate
 #'
 #' @param experiment [meapr-experiment] data set loaded with
-#'   [load_experiment_matlab] or [load_experiment_spyking_circus]
+#'   [load_experiment_matlab] or [load_experiment_phy]
 #'
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot
+#' @param bins `numeric` number of histogram bins to use
+#' @param output_base `character` where to output plots
 #' @param verbose `logical` print out verbose output
 #'
 #' @returns: [ggplot2::ggplot] of the plot and it saves the result to
@@ -26,6 +28,7 @@ plot_firing_rate_by_neuron <- function(
   experiment,
   plot_width = 7,
   plot_height = 4,
+  bins = 30,
   output_base = "product/plots",
   verbose = FALSE) {
 
@@ -42,12 +45,13 @@ plot_firing_rate_by_neuron <- function(
     ggplot2::theme_bw() +
     ggplot2::geom_histogram(
       mapping = ggplot2::aes(
-        x = log(mean_firing_rate)),
-        bins = 30) +
+        x = mean_firing_rate),
+        bins = bins) +
     ggplot2::ggtitle(
       "Per-neuron firing rate",
       subtitle = experiment$tag) +
-    scale_y_log_firing_rate()
+    scale_x_log_firing_rate() +
+    ggplot2::scale_y_continuous("Neuron Count")
 
 
   if (!is.null(output_base)) {

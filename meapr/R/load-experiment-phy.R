@@ -36,6 +36,7 @@ load_experiment_phy <- function(
     data_path,
     treatments,
     experiment_tag = NULL,
+    time_steps_per_second = 1,
     save_path = "intermediate_data/experiment_datasets",
     verbose = FALSE) {
 
@@ -48,14 +49,14 @@ load_experiment_phy <- function(
     if (verbose) {
       cat("Using '", experiment_tag, "' as the experiment_tag\n", sep = "")
     }
-  }  
-  
+  }
+
   # If requesting to save the data set exists, make sure it does before trying
   # to read it in.
   if (!is.null(save_path)) {
     if (!dir.exists(save_path)) {
       if (verbose) {
-        cat("Creating save path '", save_path, "' ...\n", sep = "")
+	cat("Creating save path '", save_path, "' ...\n", sep = "")
       }
       dir.create(save_path)
     }
@@ -68,10 +69,10 @@ load_experiment_phy <- function(
   if (!stringr::str_detect(data_path, ".modat.GUI$")) {
     warning(
       paste0(
-        "Expected the data path to have extension '.modat.GUI'. Instead ",
-        "the data path is '", data_path, "'"))
+	"Expected the data path to have extension '.modat.GUI'. Instead ",
+	"the data path is '", data_path, "'"))
   }
-  
+
   # check that numpy can be loaded via reticulate
   tryCatch({
     np <- reticulate::import("numpy")
@@ -80,28 +81,28 @@ load_experiment_phy <- function(
       "Unable to load numpy via reticulate:\n",
       e$message))
   })
-  
+
   electrode_data <- tibble::tibble(
     channel_map = np$load(paste0(data_path, "/channel_map.npy")),
     np$load(paste0(data_path, "/channel_positions.npy")) |>
       as.data.frame() |>
       dplyr::rename(
-        channel_position_X = V1,
-        channel_position_Y = V2),
+	channel_position_X = V1,
+	channel_position_Y = V2),
     channel_shanks = np$load(
       paste0(data_path, "/channel_shanks.npy")))
-  
+
   if (verbose) {
     cat("  Found data for ", nrow(electrode_data), " electrodes\n", sep = "")
   }
-  
+
   # cluster_group.csv and cluster_purity.csv are already in cluster_info.tsv
   neuron_data <- readr::read_tsv(
     file = paste0(data_path, "/cluster_info.tsv"),
     show_col_types = FALSE) |>
     dplyr::rename(
       neuron_index = cluster_id)
-  
+
   if (verbose) {
     n_good <- neuron_data |> dplyr::filter(group == "good") |> nrow()
     n_noise <- neuron_data |> dplyr::filter(group == "noise") |> nrow()
@@ -109,28 +110,30 @@ load_experiment_phy <- function(
       "  Found data for ", n_good, " good neurons and ", n_noise,
       " noise clusters\n",
       sep = "")
-  }  
-  
+  }
+
   firing_data <- tibble::tibble(
     neuron_index = spike_clusters <- np$load(
       paste0(data_path, "/spike_clusters.npy")),
     template_id = spike_templates <- np$load(
       paste0(data_path, "/spike_templates.npy")),
-    time_step = np$load(paste0(data_path, "/spike_times.npy")) / 20000,
+    time_step = np$load(paste0(data_path, "/spike_times.npy")) /
+      time_steps_per_second,
     amplitude = np$load(paste0(data_path, "/amplitudes.npy")))
+
 
   firing_data_noise <- firing_data |>
     dplyr::semi_join(
       neuron_data |>
-        dplyr::filter(group == "noise"),
+	dplyr::filter(group == "noise"),
       by = "neuron_index")
-  
+
   firing_data <- firing_data |>
     dplyr::semi_join(
       neuron_data |>
-        dplyr::filter(group == "good"),
+	dplyr::filter(group == "good"),
       by = "neuron_index")
-  
+
   if (verbose) {
     n_good <- firing_data |> nrow()
     n_noise <- firing_data_noise |> nrow()
@@ -138,7 +141,7 @@ load_experiment_phy <- function(
       "  Found data for ", n_good, " firing events in good neurons and ",
       n_noise, " firing events in noise clusters\n", sep = "")
   }
-  
+
   # if there is final end to treatment assume it is millisecond past at the last
   # firing event or the beginning of the last treatment (which ever is greater)
   if (is.na(treatments$end[nrow(treatments)])) {
@@ -151,18 +154,18 @@ load_experiment_phy <- function(
       " final firing event.", sep = "")
     }
   }
-  
+
   if (!is.null(treatments)) {
     firing_data <- firing_data |>
       fuzzyjoin::fuzzy_inner_join(
-        treatments,
-        by = c("time_step" = "begin", "time_step" = "end"),
-        match_fun = list(`>=`, `<`))
+	treatments,
+	by = c("time_step" = "begin", "time_step" = "end"),
+	match_fun = list(`>=`, `<`))
     firing_data_noise <- firing_data_noise |>
       fuzzyjoin::fuzzy_inner_join(
-        treatments,
-        by = c("time_step" = "begin", "time_step" = "end"),
-        match_fun = list(`>=`, `<`))
+	treatments,
+	by = c("time_step" = "begin", "time_step" = "end"),
+	match_fun = list(`>=`, `<`))
   } else {
     if (verbose) {
       cat("Didn't load any treatment information because treatment is NULL\n")
@@ -178,7 +181,7 @@ load_experiment_phy <- function(
     firing_noise = firing_data_noise,
     spike_sorter = "phy") |>
     structure(class = "meapr_experiment")
-  
+
   if (!is.null(save_path)) {
     path <- paste0(save_path, "/", experiment_tag, ".Rdata")
     if (verbose) {

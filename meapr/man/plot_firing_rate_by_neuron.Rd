@@ -8,17 +8,22 @@ plot_firing_rate_by_neuron(
   experiment,
   plot_width = 7,
   plot_height = 4,
+  bins = 30,
   output_base = "product/plots",
   verbose = FALSE
 )
 }
 \arguments{
 \item{experiment}{\link{meapr-experiment} data set loaded with
-\link{load_experiment_matlab} or \link{load_experiment_spyking_circus}}
+\link{load_experiment_matlab} or \link{load_experiment_phy}}
 
 \item{plot_width}{\code{numeric} width of the output plot}
 
 \item{plot_height}{\code{numeric} height of the output plot}
+
+\item{bins}{\code{numeric} number of histogram bins to use}
+
+\item{output_base}{\code{character} where to output plots}
 
 \item{verbose}{\code{logical} print out verbose output}
 }

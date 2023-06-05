@@ -5,14 +5,14 @@
 #'   duration of treatment interval is marked.
 #'
 #' @param experiment [meapr-experiment] data set loaded with
-#'   [load_experiment_matlab] or [load_experiment_spyking_circus]
+#'   [load_experiment_matlab] or [load_experiment_phy]
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot
 #' @param verbose `logical` print out verbose output.
 #'
 #' @returns: [ggplot2::ggplot] of the plot and it saves the result to
 #'   `product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.pdf`
-#'   and 
+#'   and
 #'   `product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.png`
 #'   It save both .pdf and .png because it's easier to email etc small pngs
 #'   while for use in an a manuscript having the vector version means that it`
@@ -67,7 +67,7 @@ plot_firing_density_by_neuron <- function(
       subtitle = experiment$tag) +
     ggplot2::scale_x_continuous(
       name = "Seconds",
-      breaks = experiment$treatments$begin,
+      breaks = round(experiment$treatments$begin, 1),
       expand = c(0, 0),
       sec.axis = ggplot2::dup_axis(
   name = NULL,

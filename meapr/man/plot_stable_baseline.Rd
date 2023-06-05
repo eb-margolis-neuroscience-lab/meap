@@ -16,7 +16,7 @@ plot_stable_baseline(
 }
 \arguments{
 \item{experiment}{\link{meapr-experiment} data set loaded with
-\link{load_experiment_matlab} or \link{load_experiment_spyking_circus}}
+\link{load_experiment_matlab} or \link{load_experiment_phy}}
 
 \item{baseline_treatment_name}{\code{character} name of the baseline treatment}
 

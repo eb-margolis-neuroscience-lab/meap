@@ -14,7 +14,7 @@ plot_firing_density_by_neuron(
 }
 \arguments{
 \item{experiment}{\link{meapr-experiment} data set loaded with
-\link{load_experiment_matlab} or \link{load_experiment_spyking_circus}}
+\link{load_experiment_matlab} or \link{load_experiment_phy}}
 
 \item{plot_width}{\code{numeric} width of the output plot}
 

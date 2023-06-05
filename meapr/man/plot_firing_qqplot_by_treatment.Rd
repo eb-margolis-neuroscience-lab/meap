@@ -15,7 +15,7 @@ plot_firing_qqplot_by_treatment(
 }
 \arguments{
 \item{experiment}{\link{meapr-experiment} data set loaded with
-\link{load_experiment_matlab} or \link{load_experiment_spyking_circus}}
+\link{load_experiment_matlab} or \link{load_experiment_phy}}
 
 \item{plot_width}{\code{numeric} width of the output plot}
 

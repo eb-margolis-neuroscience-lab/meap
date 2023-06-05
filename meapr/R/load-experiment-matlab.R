@@ -22,6 +22,8 @@
 #'   in the return data structure and path to save to disk if null (default),
 #'   then use \code{treatments |> basename() |> stringr::str_replace(".mat$",
 #'   "")}
+#' @param time_steps_per_second `numeric` scaling factor to convert time steps
+#'   to seconds. E.g. if the recording is done at 20k Hz, then use `20000`.
 #' @param save_path `character` file path where loaded data set should be
 #'   cached: `<save_path>/<experiment_tag>`
 #' @param verbose `logical` print out verbose output.
@@ -43,6 +45,7 @@ load_experiment_matlab <- function(
     units_fname,
     treatments,
     experiment_tag = NULL,
+    time_steps_per_second = 1,
     save_path = "intermediate_data/experiment_datasets",
     verbose = FALSE) {
 
@@ -60,14 +63,14 @@ load_experiment_matlab <- function(
   }
 
   if (verbose) {
-    cat("Reading in units from file '", units_fname, "' ... ", sep = "")
+    cat(". Reading in units from file '", units_fname, "' ...\n", sep = "")
   }
 
   if (!stringr::str_detect(units_fname, ".mat$")) {
     warning(
       paste0(
-        "units_fname='", units_fname, "' should have extension .mat\n",
-        sep = ""))
+	"units_fname='", units_fname, "' should have extension .mat\n",
+	sep = ""))
   }
 
   raw_data <- R.matlab::readMat(units_fname)
@@ -78,31 +81,46 @@ load_experiment_matlab <- function(
   n_neurons <- dim(raw_data$Unit)[3]
 
   if (verbose) {
-    cat(" found firing data for '", n_neurons, "' neurons\n", sep = "")
+    cat(". Found ", n_neurons, " neurons\n", sep = "")
   }
 
   firing <- raw_data$Unit[firing_dim, 1, 1:n_neurons] |>
     purrr::imap_dfr(function(time_steps, neuron_index) {
       tibble::tibble(
-        neuron_index = neuron_index,
-        time_step = as.numeric(time_steps))
+	neuron_index = neuron_index,
+	time_step = as.numeric(time_steps)) / time_steps_per_second
     })
 
-  if (!is.na(treatments)) {
-    firing <- firing |>
-      fuzzyjoin::fuzzy_inner_join(
-        treatments,
-        by = c("time_step" = "begin", "time_step" = "end"),
-        match_fun = list(`>=`, `<`))
+  if (verbose) {
+    cat(". Found ", nrow(firing), " firing events\n", sep = "")
+  }
+
+  firing <- firing |>
+    fuzzyjoin::fuzzy_inner_join(
+      treatments,
+      by = c("time_step" = "begin", "time_step" = "end"),
+      match_fun = list(`>=`, `<`))
+
+  # if there is final end to treatment assume it is millisecond past at the last
+  # firing event or the beginning of the last treatment (which ever is greater)
+  if (is.na(treatments$end[nrow(treatments)])) {
+    treatments$end[nrow(treatments)] <- max(
+      treatments$begin[nrow(treatments)] + 0.0001,
+      firing$time_step + 0.0001)
+    if (verbose) {
+      cat(
+	"  Since there is no end to the final treatment, setting it past the ",
+	" final firing event.", sep = "")
+    }
   }
 
   ### LOAD WAVEFORM
   waveform <- raw_data$Unit[waveform_dim, 1, 1:n_neurons] |>
     purrr::imap_dfr(function(voltages, neuron_index) {
       tibble::tibble(
-        neuron_index = neuron_index,
-        time_step = seq_along(voltages),
-        voltage = as.numeric(voltages))
+	neuron_index = neuron_index,
+	time_step = seq_along(voltages),
+	voltage = as.numeric(voltages))
     })
 
   if (is.null(experiment_tag)) {

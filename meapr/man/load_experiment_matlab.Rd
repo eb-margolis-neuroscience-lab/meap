@@ -8,6 +8,7 @@ load_experiment_matlab(
   units_fname,
   treatments,
   experiment_tag = NULL,
+  time_steps_per_second = 1,
   save_path = "intermediate_data/experiment_datasets",
   verbose = FALSE
 )
@@ -35,6 +36,9 @@ treatments are not disjoint and given chronologically.}
 in the return data structure and path to save to disk if null (default),
 then use \code{treatments |> basename() |> stringr::str_replace(".mat$",
   "")}}
+
+\item{time_steps_per_second}{\code{numeric} scaling factor to convert time steps
+to seconds. E.g. if the recording is done at 20k Hz, then use \code{20000}.}
 
 \item{save_path}{\code{character} file path where loaded data set should be
 cached: \verb{<save_path>/<experiment_tag>}}

@@ -18,8 +18,8 @@ library(rstan)
 #'  assume a general linear model with log-poisson link
 #'
 #' @param experiment [meapr-experiment] data set loaded with
-#'   [load_experiment_matlab] or [load_experiment_spyking_circus]
-#' @param output_base `characeter` path where the model should be saved. The
+#'   [load_experiment_matlab] or [load_experiment_phy]
+#' @param output_base `character` path where the model should be saved. The
 #'   output file is `<output_base>/model_log_poisson_<experiment$tag>.stan`
 #' @param ...arguments are passed to [brms::brm]
 #' @param verbose `logical` print out verbose output

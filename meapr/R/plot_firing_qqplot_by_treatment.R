@@ -16,7 +16,7 @@
 #'      diagonal will be substantial but symmetric
 #'
 #' @param experiment [meapr-experiment] data set loaded with
-#'   [load_experiment_matlab] or [load_experiment_spyking_circus]
+#'   [load_experiment_matlab] or [load_experiment_phy]
 #'
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot
@@ -38,6 +38,10 @@ plot_firing_qqplot_by_treatment <- function(
   verbose = FALSE) {
 
   data <- experiment$firing |>
+    dplyr::mutate(treatment = factor(
+      treatment,
+      levels = experiment$treatments$treatment,
+      labels = experiment$treatments$treatment)) |>
     dplyr::group_by(neuron_index, treatment) |>
     dplyr::arrange(time_step) |>
     dplyr::mutate(cum_dist = dplyr::row_number() / dplyr::n()) |>
@@ -70,7 +74,7 @@ plot_firing_qqplot_by_treatment <- function(
         x = (time_step - begin) / (end - begin),
         y = cum_dist,
         group = neuron_index),
-      alpha = .8) +
+      alpha = .6) +
     ggplot2::facet_wrap(~treatment) +
     ggplot2::ggtitle(
       "QQ-plot of firing events over exposure",

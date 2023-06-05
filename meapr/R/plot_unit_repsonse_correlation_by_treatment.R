@@ -6,7 +6,7 @@
 #'        the y-axis is average firing rate for treatment of row
 #'
 #' @param experiment [meapr-experiment] data set loaded with
-#'   [load_experiment_matlab] or [load_experiment_spyking_circus]
+#'   [load_experiment_matlab] or [load_experiment_phy]
 #'
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot
