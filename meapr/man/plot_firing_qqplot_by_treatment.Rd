@@ -10,32 +10,42 @@ plot_firing_qqplot_by_treatment(
   plot_width = 7,
   plot_height = 4,
   output_base = "product/plots",
-  verbose = TRUE
+  verbose = FALSE
 )
+}
+\arguments{
+\item{experiment}{\link{meapr-experiment} data set loaded with
+\link{load_experiment_matlab} or \link{load_experiment_phy}}
+
+\item{plot_width}{\code{numeric} width of the output plot}
+
+\item{plot_height}{\code{numeric} height of the output plot}
+
+\item{verbose}{\code{logical} print out verbose output}
+}
+\value{
+: \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
+\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.(pdf|png)}
+It save both .pdf and .png because it's easier to email etc small pngs
+while for use in an a manuscript having the vector version means that it`
+can be tweaked with illustrator
 }
 \description{
 Lattice plot for each treatment, where in each cell
-     the x-axis is percent of the treatment (by time)
-     the y-axis is percent of the total number of counts observed
-     a line for each neuron in the experiment with
-        the left endpoint anchored at the lower left
-        the right endpoint anchored at the upper right
+the x-axis is percent of the treatment (by time)
+the y-axis is percent of the total number of counts observed
+a line for each neuron in the experiment with
+the left endpoint anchored at the lower left
+the right endpoint anchored at the upper right
 }
 \details{
-If the counts occure independently through time as is assumed in a poisson process model
- then for each neuron, the line be diagonal (following the guide blue line)
-   If there is some lag to reach a stead state then the lines will look like they have a kink in it
-   if there is bursty or irregular spacing, then the spead off the diagonal will be substantial but symmetric
-
-experiment:
-  experiment dataset loaded with mema::load_experiment(...)
-
-plot_width/plot_height:
-  dimensions of the output plot
-
-returns:
-  the ggplot2
-  Saves the result to product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.(pdf|png)
-  It save both .pdf and .png because it's easier to email etc small pngs
-  while for use in an a manuscript having the vector version means that it can be tweaked with illustrator
+If the counts occur independently through time as is assumed in a Poisson
+process model then for each neuron, the line be diagonal (following the
+guide blue line)
+\itemize{
+\item If there is some lag to reach a stead state then the lines will look
+like they have a kink in it
+\item if there is bursty or irregular spacing, then the spread off the
+diagonal will be substantial but symmetric
+}
 }

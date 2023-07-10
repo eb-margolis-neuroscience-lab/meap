@@ -6,32 +6,32 @@
 \usage{
 plot_unit_response_by_treatment(
   experiment,
-  highlight_units = NULL,
   plot_width = 10,
   plot_height = 10,
   output_base = "product/plots",
-  verbose = TRUE
+  verbose = FALSE
 )
+}
+\arguments{
+\item{experiment}{\link{meapr-experiment} data set loaded with
+\link{load_experiment_matlab} or \link{load_experiment_phy}}
+
+\item{plot_width}{\code{numeric} width of the output plot}
+
+\item{plot_height}{\code{numeric} height of the output plot}
+
+\item{verbose}{\code{logical} print out verbose output}
+}
+\value{
+: \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
+\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.(pdf|png)}
+It save both .pdf and .png because it's easier to email etc small pngs
+while for use in an a manuscript having the vector version means that it`
+can be tweaked with illustrator
 }
 \description{
 Grid of treatment vs. treatment plots, in each cell
-     scatter plot for each neuronal unit
-       the x-axis is average firing rate for treatment of column
-       the y-axis is average firing rate for treatment of row
-}
-\details{
-experiment:
-  experiment dataset loaded with mema::load_experiment(...)
-
-highlight_units:
-  which units to highlight in the plot
-
-plot_width/plot_height:
-  dimensions of the output plot
-
-returns:
-  the ggplot2
-  Saves the result to product/plots/unit_response_correlation_by_treatment_<experiment_tag>_<date_code>.(pdf|png)
-  It save both .pdf and .png because it's easier to email etc small pngs
-  while for use in an a manuscript having the vector version means that it can be tweaked with illustrator
+scatter plot for each neuronal unit
+the x-axis is average firing rate for treatment of column
+the y-axis is average firing rate for treatment of row
 }

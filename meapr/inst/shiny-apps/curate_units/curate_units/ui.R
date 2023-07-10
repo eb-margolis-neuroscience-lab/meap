@@ -10,19 +10,30 @@ library(plyr)
 library(dplyr)
 library(shiny)
 
-find_loaded_experiments <- function(){
-    z <- tibble::tibble(
-            path = list.files("/Users/momeara/Google Drive/Shoichet Lab Projects/Ro 25-6981 MOA/electrophysiology/Ro_vs_DA_experiment/intermediate_data/experiment_datasets", full.names=TRUE)) %>%
-        dplyr::filter(path %>% stringr::str_detect(".Rdata$")) %>%
-        dplyr::mutate(
-            label = path %>% basename() %>% stringr::str_replace(".Rdata$", ""))
-    split(z$path, z$label)
+find_loaded_experiments <- function() {
+  z <- tibble::tibble(
+    path = list.files(
+      paste0(
+        "/Users/momeara/Google Drive/Shoichet Lab Projects/Ro 25-6981 MOA/",
+        "electrophysiology/Ro_vs_DA_experiment/intermediate_data/",
+        "experiment_datasets"),
+      full.names = TRUE)) |>
+    dplyr::filter(
+      .data[["path"]] |> stringr::str_detect(".Rdata$")) |>
+    dplyr::mutate(
+      label = .data[["path"]] |>
+        basename() |>
+        stringr::str_replace(".Rdata$", ""))
+
+  split(z$path, z$label)
 }
 loaded_experiments <- find_loaded_experiments()
 
 test_experiments <- list(
-    "20190405_12h28m32s"=
-    "/Users/momeara/Google Drive/Shoichet Lab Projects/Ro 25-6981 MOA/electrophysiology/Ro_vs_DA_experiment/intermediate_data/experiment_datasets/20190405_12h28m32s.Rdata")
+    "20190405_12h28m32s" = paste0(
+      "/Users/momeara/Google Drive/Shoichet Lab Projects/Ro 25-6981 MOA/",
+      "electrophysiology/Ro_vs_DA_experiment/intermediate_data/",
+      "experiment_datasets/20190405_12h28m32s.Rdata"))
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -33,25 +44,50 @@ shinyUI(fluidPage(
     sidebarLayout(
         sidebarPanel(
             selectInput(
-                inputId="experiment_path",
-                label="Experiment",
-                choices=loaded_experiments),
-            sliderInput("unit",
-                        "Unit",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+              inputId = "experiment_path",
+              label = "Experiment",
+              choices = loaded_experiments),
+            sliderInput(
+              "unit",
+              "Unit",
+              min = 1,
+              max = 50,
+              value = 30)
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-            tabsetPanel(type="tabs",
-                tabPanel("Waveform Lattice", plotOutput("plot_waveform_lattice", height="8in")),
-                tabPanel("Waveform Correlation Matrix", plotOutput("plot_waveform_correlation_matrix", height="8in")),
-                tabPanel("Firing Density By Neuron", plotOutput("plot_firing_density_by_neuron", height="8in")),
-                tabPanel("Firing Rate By Neuron", plotOutput("plot_firing_rate_by_neuron", height="8in")),
-                tabPanel("Firing Rate by Treatment", plotOutput("plot_firing_rate_by_treatment", height="8in")),
-                tabPanel("Firing QQ-plot by Treatment", plotOutput("plot_firing_qqplot_by_treatment", height="8in")))
+            tabsetPanel(type = "tabs",
+                tabPanel(
+                  "Waveform Lattice",
+                  plotOutput(
+                    "plot_waveform_lattice",
+                    height = "8in")),
+                tabPanel(
+                  "Waveform Correlation Matrix",
+                  plotOutput(
+                    "plot_waveform_correlation_matrix",
+                    height = "8in")),
+                tabPanel(
+                  "Firing Density By Neuron",
+                  plotOutput(
+                    "plot_firing_density_by_neuron",
+                    height = "8in")),
+                tabPanel(
+                  "Firing Rate By Neuron",
+                  plotOutput(
+                    "plot_firing_rate_by_neuron",
+                    height = "8in")),
+                tabPanel(
+                  "Firing Rate by Treatment",
+                  plotOutput(
+                    "plot_firing_rate_by_treatment",
+                    height = "8in")),
+                tabPanel(
+                  "Firing QQ-plot by Treatment",
+                  plotOutput(
+                    "plot_firing_qqplot_by_treatment",
+                    height = "8in")))
         )
     )
 ))

@@ -10,17 +10,23 @@ shiny_run_curate_units()
 Usage:
 }
 \details{
-1) Select a loaded dataset
-
-   2) Unit --> Firing pattern
-       - Select a unit from a list or small-multiples plot
-       - hilight firing rate of unit in plots
-            - Average firing rate of unit across treatments
-            - Firing density across the experiment duration
-            - Firing qq-plot across treatments
-
-   3) Brushing Firing Patterns
-       - Select query/response plots
-       - Select unit in query plot
-       - highlight unit in response plot
+\enumerate{
+\item Select a loaded data set
+\item Unit --> Firing pattern
+\itemize{
+\item Select a unit from a list or small-multiples plot
+\item Highlight firing rate of unit in plots
+\itemize{
+\item Average firing rate of unit across treatments
+\item Firing density across the experiment duration
+\item Firing qq-plot across treatments
+}
+}
+\item Brushing Firing Patterns
+\itemize{
+\item Select query/response plots
+\item Select unit in query plot
+\item highlight unit in response plot
+}
+}
 }
