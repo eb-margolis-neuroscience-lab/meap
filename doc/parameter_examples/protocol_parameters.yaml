@@ -24,7 +24,7 @@ protocol_metadata:
         an actual structured list as data in YAML'
 
 spike_sorting:
-   method: Spyking Circus version 1.4
+   method: Spyking Circus version 1.1.0
 
 data_cleaning:
    activity_threshold: .5
