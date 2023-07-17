@@ -594,7 +594,7 @@ md`* _Add new data to fileAttachArray:_`
 
 ```{ojs}
 //| echo: true
-fileAttachArray = [FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s.csv"),
+fileAttachArray = [FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_825_12h24m37s.csv"),
                    FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1.csv"),
                    FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1_rev.csv"),
                    FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_v0.csv"),
