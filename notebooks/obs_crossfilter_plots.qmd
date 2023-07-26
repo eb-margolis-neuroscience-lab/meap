@@ -404,6 +404,23 @@ y = columns_points.map(c => {
 ```
 
 ```{ojs}
+column_names = Object.keys(data.slice(0,1)[0]);
+columns__fr = column_names.slice(0,1).concat(column_names.slice(3));
+tx_names = column_names.slice(5);
+```
+
+```{ojs}
+tx_abbrevs = {
+  let abbrevs = tx_names.map(str => str.slice(0,5) + "_" + str.slice(-3));
+  let tx_abbrevs_ = {};
+  tx_names.forEach((tx_names, index) => {
+      tx_abbrevs_[tx_names] = abbrevs[index]
+  });
+  return tx_abbrevs_;
+}
+```
+
+```{ojs}
 x = {
   const x_ = columns_points.map((r, i) => d3.scaleLinear()
       .domain(d3.extent(data_points.filter(d => (d.tx === columns_points[i])),
@@ -412,7 +429,7 @@ x = {
   // kludge to use a different axis for a firing rate parallel plot
   x_[5] = d3.scalePoint()
       // .domain(d3.extent(data_points, d => d["Firing Rate"]))
-      .domain(["Baseline", "AMPA blocker DNQX", "BT139 1uM On", "BT139 1uM Off", "DAMGO 500nM On"])
+      .domain(tx_names)
       .range([padding / 2, size - padding / 2]);
   return x_;
 }
@@ -478,7 +495,7 @@ xAxis = {
           const cell_fr = d3.select(this).call(axis_fr.scale(d)).call(xFrAxisLabel);
           cell_fr.selectAll(".tick text").each(function(g, j) {
             // j is the index of each category tick in d3.scalePoint() d
-            return d3.select(this).text(tx_abrev[columns_points[j]]);
+            return d3.select(this).text(tx_abbrevs[columns_points[j]]);
           })
           return cell_fr;
         }
@@ -567,10 +584,6 @@ function xFrAxisLabel(cell) {
 }
 ```
 
-```{ojs}
-tx_abrev = ({"Baseline":"Base", "AMPA blocker DNQX":"DNQX", "BT139 1uM On":"BT139-on", "BT139 1uM Off":"BT139-off", "DAMGO 500nM On":"DAMGO", "Firing Rate":"f.r."});
-```
-
 <!-- This section title useful in online notebook only
 ```{ojs}
 md`### Load & Clean Point Data`
@@ -595,6 +608,8 @@ md`* _Add new data to fileAttachArray:_`
 ```{ojs}
 //| echo: true
 fileAttachArray = [FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_825_12h24m37s.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_20211005_17h33m55_test.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_debug_20211005_17h33m55s_test.csv"),
                    FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1.csv"),
                    FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1_rev.csv"),
                    FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_v0.csv"),
@@ -609,12 +624,15 @@ fileAttachArray = [FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_inte
 ```
 
 ```{ojs}
-columns__fr = ["timestamp", "cum_dist", "x_idx", "Baseline", "AMPA blocker DNQX", "BT139 1uM On", "BT139 1uM Off", "DAMGO 500nM On", "Firing Rate"]
-```
-
-```{ojs}
 // This is the graphic cell matrix layout of the Treatment groups
-tx_panel_array = [["Baseline", "AMPA blocker DNQX", "BT139 1uM On"], ["BT139 1uM Off", "DAMGO 500nM On", "Firing Rate"]]
+// This is designed for a 2x3 matrix of plots. It is specified that "Firing Rate"
+// will be in the bottom right plot. Example panel arrangement array:
+// tx_panel_array = [["Baseline", "AMPA blocker DNQX", "BT139 1uM On"], ["BT139 1uM Off", "DAMGO 500nM On", "Firing Rate"]]
+
+tx_panel_array = {
+  let tx_epochs = tx_names.filter( x => x != "Firing Rate" )
+  return [tx_epochs.slice(0,3), tx_epochs.concat(["", ""]).slice(3,5).concat(["Firing Rate"])];
+};
 ```
 
 ```{ojs}
@@ -701,12 +719,14 @@ data_paths = {
 ```
 
 ```{ojs}
-x_col = ({"Baseline" : 'x_idx',
-          "AMPA blocker DNQX" : 'x_idx',
-          "BT139 1uM On" : 'x_idx',
-          "BT139 1uM Off" : 'x_idx',
-          "DAMGO 500nM On" : 'x_idx',
-          "Firing Rate" : 'tx'});
+x_col = {
+  let x_col_ = {};
+  columns_points.forEach((columns_points, index) => {
+      x_col_[columns_points] = 'x_idx'
+  });
+  x_col_["Firing Rate"] = 'tx';
+  return x_col_;
+}
 ```
 
 ```{ojs}
@@ -871,4 +891,20 @@ import { table } from "@gampleman/table"
 
 
 
+```{ojs}
+//| echo: true
+md`## Debugging output variables. Remove from code after development.`
 
+md`All columns in data file`
+columns__fr;
+
+md`Names of epochs in file for plotting`
+tx_names;
+columns_points;
+
+md`Panel arrangment by treatment`
+tx_panel_array;
+
+md`X-axis dimension for each panel`
+x_col;
+```
