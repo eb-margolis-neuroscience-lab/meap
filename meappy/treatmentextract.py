@@ -76,7 +76,13 @@ class FormWidget(QWidget):
         self.savebutton.clicked.connect(self.saveandclose)
 #the button saves the 'treatments.csv' file, quits the program
     def saveandclose(self):
-        savedata = dataextract[dataextract['phase'].str.len() > 0]
+        tempsavedata = dataextract[dataextract['phase'].str.len() > 0]
+        finalindexlist = list(range(0, len(tempsavedata)))
+        tempsavedata.insert(0,'revindex', finalindexlist)
+        savedata = tempsavedata.set_index('revindex')
+        indexfororder = ["{:02d}".format(finalindexlist[i]) for i in finalindexlist]
+        phasewithindex = [indexfororder[i] + "_" + savedata['phase'][i] for i in finalindexlist]
+        savedata['phase'] = phasewithindex
         savedata.to_csv('treatments.tsv', columns = ['time_secs', 'phase'], header = ['begin', 'label'], index=False, sep="\t")
         sys.exit()
 
