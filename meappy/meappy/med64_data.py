@@ -26,6 +26,7 @@ def show_plot(plot):
 
 
 def find_expt_files(yaml_file):
+    print(yaml_file)
     with open(yaml_file, "r") as file:
         med64_data = yaml.safe_load(file)
 

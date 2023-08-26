@@ -608,6 +608,8 @@ md`* _Add new data to fileAttachArray:_`
 ```{ojs}
 //| echo: true
 fileAttachArray = [FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_825_12h24m37s.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20211005_17h33m55s.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20190808_11h58m51s.csv"),
                   FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_20211005_17h33m55_test.csv"),
                   FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_debug_20211005_17h33m55s_test.csv"),
                    FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1.csv"),

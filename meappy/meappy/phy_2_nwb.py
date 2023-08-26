@@ -5,7 +5,7 @@ from scipy.io import savemat
 try:
     from waveform import (Fs, PhyPaths, PhyData, get_raw_data, 
                           get_phy_spikes_list, get_raw_phy_spike_waves)
-    from meappy.configuration import USER_PATHS, USER, XL_TAB, XL_COLS, ROW_ID_LIST
+    from meappy.configuration import USER_PATHS, USER, XL_COLS
 
 except:
     waveform_dir = '.waveform'  # relative module path for ipynb import
