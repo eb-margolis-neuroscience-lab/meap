@@ -4,15 +4,25 @@
 #Created EBM 9-17-2022
 #Edited EBM 10-28-2022
 
-import sys
+import sys, os
 import pandas as pd
 from PyQt5 import QtGui
 from PyQt5.QtCore import QAbstractTableModel, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableView
 from PyQt5.QtWidgets import QPushButton, QLabel, QTableWidget, QVBoxLayout, QWidget, QTableWidgetItem, QTableView
 
+#create input and output file paths from command line argument
+try:
+    input_filepath = sys.argv[1]
+except:
+    print(f"Error: Missing command line argument with filename path for modat_spike_freq CSV.") 
+output_dir = os.path.dirname(input_filepath)
+output_file = os.path.join(output_dir, 'treatments.tsv')
+    
 #create global dataframe from the input file, clean up to draft treatments
-pddata = pd.read_csv(open(sys.argv[1]), skiprows = 2, header = 0, usecols = [0,1,2])
+pddata = pd.read_csv(open(input_filepath), skiprows = 2, header = 0, usecols = [0,1,2], \
+                     dtype={"time_secs": float, "phase": str, "ch1": str}, engine='python' 
+                    )
 dataextract = pddata[~pddata['phase'].isnull()]
 dataextract = dataextract[~dataextract['time_secs'].isnull()]
 lastrow = pd.DataFrame({'time_secs':[pddata['time_secs'].max()], 'phase':['END']})
@@ -83,7 +93,7 @@ class FormWidget(QWidget):
         indexfororder = ["{:02d}".format(finalindexlist[i]) for i in finalindexlist]
         phasewithindex = [indexfororder[i] + "_" + savedata['phase'][i] for i in finalindexlist]
         savedata['phase'] = phasewithindex
-        savedata.to_csv('treatments.tsv', columns = ['time_secs', 'phase'], header = ['begin', 'label'], index=False, sep="\t")
+        savedata.to_csv(output_file, columns = ['time_secs', 'phase'], header = ['begin', 'label'], index=False, sep="\t")
         sys.exit()
 
 w = 350

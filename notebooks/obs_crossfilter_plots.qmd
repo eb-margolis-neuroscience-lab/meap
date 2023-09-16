@@ -64,7 +64,6 @@ In addition to indicating the direction of change in activity, the plots spatial
 ```
 
 ```{ojs}
-
 img2 = html`<img src="https://github.com/walt-r/med64-d3/blob/main/med64-d3-diagram_change_time_degree.png?raw=true", width=40%/>`
 ```
 
@@ -75,14 +74,14 @@ md`
 
 The *Data File* drop down menu will load data from a new brain slice. 
 
-The 5 top and left most plots show 5 periods of the experiment:
+The top and left most plots show periods of the experiment:
 - *Baseline*: 10 minutes of no treatment
 - *AMPA blocker DNQX*. This blocks glutamate signalling between neurons in preparation. This blocks activity in one neuron from directly exciting neurons on other channels. Subsequent treatments are also in the presence of DNQX
 - *BT139 ON*: experimental treatment applied
 - *BT139 OFF*: experimental treatment washed off
 - *DAMGO ON*: mu-opioid agonist applied
 
-The *lower right plot* can be thought of as a summary plot of the first 5 and connects them in one image.  It shows the mean firing rate of each neuron (unit) across the different sequential experimental periods.
+The *lower right plot* can be thought of as a summary plot of all the treatments and connects them in one image.  It shows the mean firing rate of each neuron (unit) across the different sequential experimental periods.
 `
 ```
 
@@ -340,6 +339,7 @@ function brush(cell, circle, path, svg) {
 // x[] (and y[]) is array of functions, each mapping the data of column to the pixels of svg
 // When each row in data is set to 'hidden' is applies directly to all cells, 
 // which are linked to a single underlying representation of the data as a single matrix.
+  
   function brushed({selection}, [i, j]) {
     let selected = [];
     let all_units = [...new Set(data_points.map(d => d.unit))];
@@ -411,6 +411,7 @@ tx_names = column_names.slice(5);
 
 ```{ojs}
 tx_abbrevs = {
+  // construct short display names using a few characters of full name
   let abbrevs = tx_names.map(str => str.slice(0,5) + "_" + str.slice(-3));
   let tx_abbrevs_ = {};
   tx_names.forEach((tx_names, index) => {
@@ -427,7 +428,7 @@ x = {
                         d => d["x_idx"]))  // timestamp
       .range([padding / 2, size - padding / 2]));
   // kludge to use a different axis for a firing rate parallel plot
-  x_[5] = d3.scalePoint()
+  x_[fr_panel_index] = d3.scalePoint()
       // .domain(d3.extent(data_points, d => d["Firing Rate"]))
       .domain(tx_names)
       .range([padding / 2, size - padding / 2]);
@@ -463,7 +464,7 @@ yAxis = {
       .attr("transform", (d, i) => 
             `translate(${cellXY(i)[1] * size + padding/2}, ${cellXY(i)[0] * size})`)
       .each(function(d, i) {
-        if (i  == 5) {
+        if (i  == fr_panel_index) {
           return d3.select(this).call(axis_fr.scale(d)).call(yFrAxisLabel);          
         } else {
           return d3.select(this).call(axis.scale(d)).call(yAxisLabel);}
@@ -489,9 +490,9 @@ xAxis = {
       .attr("transform", (d, i) => 
             `translate(${(cellXY(i)[1] * size)}, ${(cellXY(i)[0] * size + padding/2)})`)
       .each(function(d, i) {
-        if (i < 5) {
+        if (i < fr_panel_index) {
           return d3.select(this).call(axis.scale(d)).call(xAxisLabel) /// here...
-        } else if (i == 5) {
+        } else if (i == fr_panel_index) {
           const cell_fr = d3.select(this).call(axis_fr.scale(d)).call(xFrAxisLabel);
           cell_fr.selectAll(".tick text").each(function(g, j) {
             // j is the index of each category tick in d3.scalePoint() d
@@ -607,21 +608,16 @@ md`* _Add new data to fileAttachArray:_`
 
 ```{ojs}
 //| echo: true
-fileAttachArray = [FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_825_12h24m37s.csv"),
-                  FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20211005_17h33m55s.csv"),
+fileAttachArray = [
                   FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20190808_11h58m51s.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20190808_11h58m51s_no_flow.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20190808_16h48m41s.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20190809_11h22m58s.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20190809_13h34m40s.csv"),
+                  FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_825_12h24m37s.csv"),
                   FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_20211005_17h33m55_test.csv"),
-                  FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_debug_20211005_17h33m55s_test.csv"),
-                   FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1.csv"),
-                   FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_n1_rev.csv"),
-                   FileAttachment("d3_cum_fr_10K_interp_825_12h24m37s_v0.csv"),
-                   FileAttachment("d3_cum_fr_10K_interp_825_13h36m25s@2.csv"),
-                   FileAttachment('d3_cum_fr_10K_interp_825_15h01m13s.csv'),
-                   FileAttachment('d3_cum_fr_10K_interp_825_16h06m19s.csv'),
-                   FileAttachment('d3_cum_fr_10K_interp_827_12h06m26s.csv'),
-                   FileAttachment('d3_cum_fr_10K_interp_827_13h30m23s.csv'),
-                   FileAttachment('d3_cum_fr_10K_interp_827_15h57m53s.csv'),
-                   FileAttachment('d3_cum_fr_10K_interp_20211005_17h33m55s.csv'),
+                  FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_interp_debug_20211005_17h33m55s_test.csv"), 
+                  FileAttachment("obs_crossfilter_plots_data/d3_nwb1_20211005_17h33m55s.csv"),
                   ]
 ```
 
@@ -633,7 +629,7 @@ fileAttachArray = [FileAttachment("obs_crossfilter_plots_data/d3_cum_fr_10K_inte
 
 tx_panel_array = {
   let tx_epochs = tx_names.filter( x => x != "Firing Rate" )
-  return [tx_epochs.slice(0,3), tx_epochs.concat(["", ""]).slice(3,5).concat(["Firing Rate"])];
+  return [tx_epochs.slice(0,3), tx_epochs.concat(["", "", ""]).slice(3,6), tx_epochs.concat(["", "", "", "", ""]).slice(6,8).concat(["Firing Rate"]) ];
 };
 ```
 
@@ -643,7 +639,7 @@ columns_points = tx_panel_array.flat()
 
 ```{ojs}
 // Indicates what data column is used for each cell in graphic matrix
-column_pointx = Array(5).fill('x_idx').concat(['tx']) //data_points.columns.slice(-1)
+column_pointx = Array(fr_panel_index).fill('x_idx').concat(['tx']) //data_points.columns.slice(-1)
 ```
 
 ```{ojs}
@@ -853,8 +849,12 @@ panel_rows = tx_panel_array.length
 ```
 
 ```{ojs}
-// rename to cellCols?
 panel_cols = tx_panel_array[0].length
+```
+
+```{ojs}
+// The firing rate panel in figure has unique axis qualities
+fr_panel_index = columns_points.length - 1
 ```
 
 ```{ojs}
@@ -903,10 +903,15 @@ columns__fr;
 md`Names of epochs in file for plotting`
 tx_names;
 columns_points;
+md`firing rate panel index (different plot axis);`
+fr_panel_index;
 
 md`Panel arrangment by treatment`
 tx_panel_array;
 
 md`X-axis dimension for each panel`
 x_col;
+
+md`Column Points X:`
+column_pointx;
 ```
