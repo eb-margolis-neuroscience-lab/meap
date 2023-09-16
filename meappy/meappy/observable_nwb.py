@@ -28,7 +28,7 @@ from collections.abc import Iterable
 
 
 # meappy module
-from med64_data import *
+from med64_data import read_slice_filepaths, read_tx_file
 from phy_2_nwb import load_spiketime_clust_arr
 from meappy.parameter_yaml import USER, USER_PATHS
 
@@ -38,40 +38,6 @@ cmap = cm.get_cmap('tab20')
 
 MAX_SAMPLES = 32  # default when no df for get_max_samples(df, MAX_D3_ROWS)
 MAX_D3_ROWS = 10000 # local constant used in num_new_points()
-
-
-from med64_data import *
-
-
-def find_better_expt_files(data_dir):
-    files = os.listdir(data_dir)
-
-    re_units = re.compile(r'^EBM_betterResults.*')
-    re_tx = re.compile(r'^treatmentinfo.*')
-    re_expr_id = re.compile(r"([0-9]{3}_[0-9]{2}h[0-9]{2}m[0-9]{2}s)\.['csv|mat']{3}")
-
-    unit_files = dict()
-    tx_files = dict()
-
-    for file in files:
-        expr_id = re_expr_id.findall(file)
-        if expr_id:
-            units_file = re_units.findall(file)
-            if units_file:
-                unit_files[expr_id[0]] = units_file[0]
-            tx_file = re_tx.findall(file)
-            if tx_file:
-                tx_files[expr_id[0]] = tx_file[0]
-    expt_list = sorted(list(unit_files.keys()))
-
-    print('FOUND Data FILES:')
-    print('Experiment IDs: \n\t' + '\n\t'.join(expt_list))
-    print('Units Files: \n\t' + '\n\t'.join(unit_files.values()))
-    print('Treatment Files: \n\t' + '\n\t'.join(tx_files.values()))
-    
-    return expt_list, tx_files, unit_files
-
-
 
 
 # ### Firing Rate Calc
@@ -147,8 +113,8 @@ def get_nwb_data(unit_filename, tx_filename):
 
 
 #  next line is to create from raw file input
-def get_mean_firing_rates(unit_files, tx_files):
-    units_data, tx_times = get_nwb_data(unit_files, tx_files)    
+def get_mean_firing_rates(unit_file, tx_file):
+    units_data, tx_times = get_nwb_data(unit_file, tx_file)    
     mean_firing_by_tx = get_mean_firing_by_tx(units_data, tx_times)
     return mean_firing_by_tx
 
@@ -317,8 +283,8 @@ def add_anchors(df):
 
 
 # ## Export QQ data for d3 Linked Brushing Cross-filtering
-def data_to_qq(unit_files, tx_files):
-    units_data, tx_times = get_nwb_data(unit_files, tx_files)
+def data_to_qq(unit_filename, tx_filename):
+    units_data, tx_times = get_nwb_data(unit_filename, tx_filename)
     print(f"data_to_qq: tx_times: {tx_times}")
     df = build_df(units_data, tx_times)
     df = add_anchors(df)
@@ -537,36 +503,37 @@ def export_d3_data(df_d3, expt_id):
     print('\tSaved ' + save_csv_filepath)
 
 
-def export_from_filelist(expt_list, datafile_args, interp=True, max_d3_rows=MAX_D3_ROWS):
+def export_from_filelist(slice_id, unit_file, tx_filename, interp=True, max_d3_rows=MAX_D3_ROWS):
     """
-    expt_list is list of tuples with [(slice_id, unit_filepath), ...]
+    
+    """    
+    print(f"unit_file: {unit_file}")
+    df = data_to_qq(unit_file, tx_filename)  # unit_filename, tx_filename
+    print(f"data_to_qq: {df['tx'].unique()}")
+    df_downsampled = downsample_data(df, max_d3_rows)
+    if interp:
+        interp_units = activity_gaps_unit_tx(df, get_max_samples(df, max_d3_rows))
+        interp_points_df = get_interp_points_df(df_downsampled, interp_units, max_d3_rows)
+        df_d3 = df_downsampled.append(interp_points_df)
+        # sort interpolated date into order of full dataframe
+        df_d3.sort_values(by=['unit', 'x_plot'], inplace=True)
+    df_d3 = clean_column_header(df_d3)
+    df_d3 = pad_data(df_d3)
+
+    print(f"export_from_filelist: tx_filename: {tx_filename}")
+    mean_firing_by_tx = get_mean_firing_rates(unit_file, tx_filename) # get_mean_firing_by_tx(units_data, tx_times)
+    firing_rate_df = get_firing_rate_df(df_d3, mean_firing_by_tx)
+    df_d3 = firing_rate_df.append(df_d3)
+    export_d3_data(df_d3, slice_id)
+
+
+def file_attachment_list(slice_id):
     """
-    for slice_id, unit_file in expt_list:
-        df = data_to_qq(unit_file, datafile_args)
-        print(f"data_to_qq: {df['tx'].unique()}")
-        df_downsampled = downsample_data(df, max_d3_rows)
-        if interp:
-            interp_units = activity_gaps_unit_tx(df, get_max_samples(df, max_d3_rows))
-            interp_points_df = get_interp_points_df(df_downsampled, interp_units, max_d3_rows)
-            df_d3 = df_downsampled.append(interp_points_df)
-            # sort interpolated date into order of full dataframe
-            df_d3.sort_values(by=['unit', 'x_plot'], inplace=True)
-        df_d3 = clean_column_header(df_d3)
-        df_d3 = pad_data(df_d3)
-
-        print(f"export_from_filelist: datafile_args: {datafile_args}")
-        mean_firing_by_tx = get_mean_firing_rates(unit_file, datafile_args) # get_mean_firing_by_tx(units_data, tx_times)
-        firing_rate_df = get_firing_rate_df(df_d3, mean_firing_by_tx)
-        df_d3 = firing_rate_df.append(df_d3)
-        export_d3_data(df_d3, slice_id)
-
-
-def file_attachment_list(expt_list):
-#     save_csv_filepath_dir = '/Users/walter/Data/margolis/observable/'
+    Create line of code to add to the Observable file for the drop down file list
+    """
     attach_list = "["
-    for expt_id in expt_list:
-        filename = "FileAttachment(\'d3_cum_fr_10K_interp_" + expt_id + ".csv\')"
-        attach_list += filename + ",\n"
+    filename = "FileAttachment(\'d3_cum_fr_10K_interp_" + slice_id + ".csv\')"
+    attach_list += filename + ",\n"
     attach_list += "]"
 #     return attach_list
     print(attach_list)
@@ -582,15 +549,20 @@ def main():
         DATA_DIR = '/Users/walter/Data/med64/experiment/VTA_NMDA/20211005_17h33m55s/' # walter local
     else:
         # DATA_DIR = '/Users/walter/Data/z4/20190808_11h58m51s/' # walter local
-        DATA_DIR = '/Users/walter/Data/z4/20190808_15h00m18s/' # walter local
+        # DATA_DIR = '/Users/walter/Data/z4/20190808_15h00m18s/' # aborted expt
+        # DATA_DIR = '/Users/walter/Data/z4/20190808_16h48m41s'
+        # DATA_DIR = '/Users/walter/Data/z4/20190809_11h22m58s'
+        DATA_DIR = '/Users/walter/Data/z4/20190809_13h34m40s'
     
     SLICE_PARAMS_FILE = 'slice_parameters.yaml'
     
     splice_params_filepath = os.path.join(DATA_DIR, SLICE_PARAMS_FILE)
-    expt_list, tx_files, unit_files = find_expt_files(splice_params_filepath)
+    slice_id, tx_filename, unit_file = read_slice_filepaths(splice_params_filepath) 
 
-    export_from_filelist([(expt_list, unit_files)], tx_files, expt_list, 
-                         max_d3_rows=MAX_D3_ROWS)
+    # export_from_filelist([(slice_id, unit_file)], tx_filename, slice_id, 
+                         # max_d3_rows=MAX_D3_ROWS)
+    export_from_filelist(slice_id, unit_file, tx_filename)
+        
     
 
 DEBUGGING_NWB = True

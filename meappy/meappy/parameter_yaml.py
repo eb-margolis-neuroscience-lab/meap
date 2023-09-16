@@ -323,8 +323,8 @@ def read_xl_row(row_name, tab_name, xl, slice_params):
                          f'time_str{time_str}, date_str: {date_str}')
         
     slice_params["slice_metadata"]["notes"] = (
-        "Channels: " + str(xl[XLCOL["notes_issues"]]) + \
-        "\nMisc: " + str(xl[XLCOL["notes"]])
+        "Channels: " + str(xl[XLCOL["notes_issues"]]) + "\n" + \
+        "Misc: " + str(xl[XLCOL["notes"]])
     )
     slice_params["slice_metadata"]["region"] = xl[XLCOL["region"]]
     slice_params["slice_metadata"]["type"] = xl[XLCOL["experiment_type"]]
