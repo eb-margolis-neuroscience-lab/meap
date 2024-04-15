@@ -62,16 +62,18 @@ load_treatments_file <- function(
   }
 
   # check treatments are chronological
-  for (i in 1:(nrow(treatments) - 1)) {
-    if (treatments$end[i] > treatments$begin[i + 1]) {
-      stop(paste0(
-        "Treatments are out of chronological order:\n",
-        "  treatment ", i, "='", treatments$treatment[i], "' ",
-        "with begin='", treatments$begin[i], "', end='", treatments$end[i],
-        "'\n",
-        "  treatment ", i + 1, "='", treatments$treatment[i + 1], "' ",
-        "with begin='", treatments$begin[i + 1], "', end='",
-        treatments$end[i + 1], "'"))
+  if (nrow(treatments) > 1) {
+    for (i in 1:(nrow(treatments) - 1)) {
+      if (treatments$end[i] > treatments$begin[i + 1]) {
+        stop(paste0(
+          "Treatments are out of chronological order:\n",
+          "  treatment ", i, "='", treatments$treatment[i], "' ",
+          "with begin='", treatments$begin[i], "', end='", treatments$end[i],
+          "'\n",
+          "  treatment ", i + 1, "='", treatments$treatment[i + 1], "' ",
+          "with begin='", treatments$begin[i + 1], "', end='",
+          treatments$end[i + 1], "'"))
+      }
     }
   }
   treatments
