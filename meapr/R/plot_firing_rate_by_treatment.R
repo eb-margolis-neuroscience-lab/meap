@@ -30,6 +30,10 @@ plot_firing_rate_by_treatment <- function(
   verbose = FALSE) {
 
   exposure_counts <- experiment$firing |>
+    dplyr::mutate(treatment = factor(
+      x = treatment,
+      levels = experiment$treatments$treatment,
+      labels = experiment$treatments$treatment))
     dplyr::group_by(neuron_index, treatment) |>
     dplyr::summarize(
       count = dplyr::n(),
@@ -49,7 +53,7 @@ plot_firing_rate_by_treatment <- function(
       width = .15,
       height = 0) +
     ggplot2::ggtitle(
-      "Neuron Firing Rate by Condition",
+      "Neuron Firing Rate by Treatment",
       subtitle = experiment$tag) +
     ggplot2::scale_x_discrete("Treatment") +
     scale_y_log_firing_rate()

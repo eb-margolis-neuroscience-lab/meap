@@ -39,7 +39,7 @@ plot_firing_qqplot_by_treatment <- function(
 
   data <- experiment$firing |>
     dplyr::mutate(treatment = factor(
-      treatment,
+      x = treatment,
       levels = experiment$treatments$treatment,
       labels = experiment$treatments$treatment)) |>
     dplyr::group_by(neuron_index, treatment) |>

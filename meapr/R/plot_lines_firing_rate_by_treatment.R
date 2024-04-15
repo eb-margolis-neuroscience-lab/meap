@@ -30,6 +30,10 @@ plot_lines_firing_rate_by_treatment <- function(
   verbose = FALSE) {
 
   exposure_counts <- experiment$firing |>
+    dplyr::mutate(treatment = factor(
+      treatment,
+      levels = experiment$treatments$treatment,
+      labels = experiment$treatments$treatment)) |>
     dplyr::group_by(neuron_index, treatment) |>
     dplyr::summarize(
       count = dplyr::n(),
