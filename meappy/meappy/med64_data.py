@@ -25,7 +25,9 @@ def show_plot(plot):
         plot.show()
 
 
-def find_expt_files(yaml_file):
+def read_slice_filepaths(yaml_file):
+    # was renamed from find_expt_files
+    print(f"read_slice_filepaths: {yaml_file}")
     with open(yaml_file, "r") as file:
         med64_data = yaml.safe_load(file)
 
@@ -46,9 +48,9 @@ def find_expt_files(yaml_file):
 def read_tx_file(tx_filename):
     tx_times = dict()
     with open(tx_filename) as csvDataFile:
-        csvReader = csv.DictReader(csvDataFile)
+        csvReader = csv.DictReader(csvDataFile, delimiter='\t')
         for row in csvReader:
-            tx_times[row[" label"]] = float(row["begin"])
+            tx_times[row["label"]] = float(row["begin"])
     return tx_times
 
 
@@ -365,7 +367,7 @@ def main():
     yaml_file = os.path.join(data_dir, slice_params_file)
 
     # it appears that expt_list actually goes unused...!
-    expt_list, tx_filename, unit_filename = find_expt_files(yaml_file)
+    expt_list, tx_filename, unit_filename = read_slice_filepaths(yaml_file)
 
     # units_mat = scipy.io.loadmat(unit_filename)
     units_data, tx_times = get_expt_data(unit_filename, tx_filename)

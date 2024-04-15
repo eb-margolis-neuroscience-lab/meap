@@ -23,7 +23,6 @@ LOG_FILE = path.join(data_path, 'meap/experiment/log_file.txt')
 
 # Repo dir relative paths
 params_examples = path.join(meap_path, 'doc/parameter_examples/')  # for out-of-box examples using github repo
-
 # box shared directory paths
 box_path = path.join(_HOME, '/Library/CloudStorage/Box-Box')
 box_output_path = path.join(box_path, 'meap_output')
