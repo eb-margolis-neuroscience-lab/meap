@@ -5,9 +5,9 @@
 #'   the treatment is applied.
 #'
 #' @param treatments `data.frame` or `character`. If a `data.frame` it should
-#'   have columns `[treatment, begin, end]` for each treatment in the
+#'   have columns `[index, treatment, begin, end]` for each treatment in the
 #'   experiment, where begin and end are given as seconds since the beginning
-#'   of the experiment. If it is a `character` it should be a path to a `.csv`
+#'   of the experiment. If it is a `character` it should be a path to a `.tsv`
 #'   file with the same columns. To help detect problems, an warning is given
 #'   if the treatments are not disjoint and given chronologically.
 #' @param verbose `logical` print out verbose output
@@ -26,21 +26,31 @@ load_treatments_file <- function(
       cat("Loading treatment schedule from '", treatments, "' ... ", sep = "")
     }
 
-    if (!stringr::str_detect(treatments, ".csv$")) {
+    if (!stringr::str_detect(treatments, ".tsv$")) {
       warning(
-        "treatments='", treatments, "' should have '.csv' extension.\n",
+        "treatments='", treatments, "' should have '.tsv' extension.\n",
         sep = "")
     }
 
-    treatments <- readr::read_csv(
+    treatments <- readr::read_tsv(
       file = treatments,
       col_types = readr::cols(
-        treatment = readr::col_character(),
-        begin = readr::col_double(),
-        end = readr::col_double())) |>
-      dplyr::transmute(
-        # this is to ensure the correct order of the conditions in plots etc.
-        treatment = factor(treatment, labels = treatment, levels = treatment),
+        begin = readr::col_integer(),
+        label = readr::col_character())) |>
+      dplyr::mutate(
+        index = label |>
+          stringr::str_extract("^[0-9]+") |>
+          as.numeric(),
+        treatment = label |>
+          stringr::str_replace("^[0-9]+_", ""),
+        is_washout = lower(treatment) == "washout",
+        is_baseline = lower(treatment) == "baseline",
+        end = begin |> dplyr::lead()) |>
+      dplyr::filter(
+        treatment != "END") |>
+      dplyr::select(
+        index,
+        treatment,
         begin,
         end)
   }

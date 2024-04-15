@@ -1,0 +1,11 @@
+begin	label
+1	00_Baseline
+625	01_DAMGO 5uM
+1230	02_washout
+2452	03_Z4 1uM
+3058	04_washout
+3667	05_Baclofen 10uM
+4296	06_washout
+4923	07_Ttx 1uM
+5600	08_washout
+5727	09_END
