@@ -43,8 +43,8 @@ load_treatments_file <- function(
           as.numeric(),
         treatment = label |>
           stringr::str_replace("^[0-9]+_", ""),
-        is_washout = lower(treatment) == "washout",
-        is_baseline = lower(treatment) == "baseline",
+        is_washout = tolower(treatment) == "washout",
+        is_baseline = tolower(treatment) == "baseline",
         end = begin |> dplyr::lead()) |>
       dplyr::filter(
         treatment != "END") |>
