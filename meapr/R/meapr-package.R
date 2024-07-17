@@ -57,4 +57,4 @@
 #'      including checking the quality of neurons and stability baselines.
 #'    * **Estimate firing patterns** of neurons across treatments and
 #'      experiments.
-NULL
+"_PACKAGE"

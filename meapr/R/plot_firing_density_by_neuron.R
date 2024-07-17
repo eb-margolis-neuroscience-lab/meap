@@ -27,6 +27,13 @@ plot_firing_density_by_neuron <- function(
   output_base = "product/plots",
   verbose = FALSE) {
 
+  if (nrow(experiment$firing) == 0) {
+    warning(paste0(
+      "For experiment '", experiment$tag, "' ",
+      "unable to plot firing density by neuron because there are ",
+      "no firing events"))
+    return(NULL)
+  }
 
   data <- experiment$firing |>
     dplyr::select(neuron_index, time_step) |>
@@ -50,7 +57,7 @@ plot_firing_density_by_neuron <- function(
     ggplot2::geom_tile(
       mapping = ggplot2::aes(
         x = time_step,
-        y = neuron_index,
+        y = factor(neuron_index),
         fill = normalized_log_firing_density)) +
     ggplot2::geom_rect(
       data = experiment$treatments,
@@ -73,7 +80,7 @@ plot_firing_density_by_neuron <- function(
   name = NULL,
   breaks = with(experiment$treatments, begin + (end - begin) / 2),
   labels = experiment$treatments$treatment)) +
-    ggplot2::scale_y_continuous(
+    ggplot2::scale_y_discrete( 
       name = "Neuron Index",
       expand = c(0, 0)) +
     ggplot2::scale_fill_viridis_c("Per-neuron normalized log firing density") +

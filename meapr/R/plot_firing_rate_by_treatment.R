@@ -33,7 +33,7 @@ plot_firing_rate_by_treatment <- function(
     dplyr::mutate(treatment = factor(
       x = treatment,
       levels = experiment$treatments$treatment,
-      labels = experiment$treatments$treatment))
+      labels = experiment$treatments$treatment)) |>
     dplyr::group_by(neuron_index, treatment) |>
     dplyr::summarize(
       count = dplyr::n(),

@@ -8,9 +8,9 @@ load_treatments_file(treatments, verbose = FALSE)
 }
 \arguments{
 \item{treatments}{\code{data.frame} or \code{character}. If a \code{data.frame} it should
-have columns \verb{[treatment, begin, end]} for each treatment in the
+have columns \verb{[index, treatment, begin, end]} for each treatment in the
 experiment, where begin and end are given as seconds since the beginning
-of the experiment. If it is a \code{character} it should be a path to a \code{.csv}
+of the experiment. If it is a \code{character} it should be a path to a \code{.tsv}
 file with the same columns. To help detect problems, an warning is given
 if the treatments are not disjoint and given chronologically.}
 
