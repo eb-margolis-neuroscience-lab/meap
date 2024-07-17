@@ -69,8 +69,8 @@ load_experiment_phy <- function(
   if (!stringr::str_detect(data_path, ".modat.GUI$")) {
     warning(
       paste0(
-	"Expected the data path to have extension '.modat.GUI'. Instead ",
-	"the data path is '", data_path, "'"))
+	      "Expected the data path to have extension '.modat.GUI'. Instead ",
+	      "the data path is '", data_path, "'"))
   }
 
   # check that numpy can be loaded via reticulate
@@ -125,13 +125,13 @@ load_experiment_phy <- function(
   firing_data_noise <- firing_data |>
     dplyr::semi_join(
       neuron_data |>
-	dplyr::filter(group == "noise"),
+	      dplyr::filter(group == "noise"),
       by = "neuron_index")
 
   firing_data <- firing_data |>
     dplyr::semi_join(
       neuron_data |>
-	dplyr::filter(group == "good"),
+	      dplyr::filter(group == "good"),
       by = "neuron_index")
 
   if (verbose) {
@@ -158,14 +158,14 @@ load_experiment_phy <- function(
   if (!is.null(treatments)) {
     firing_data <- firing_data |>
       fuzzyjoin::fuzzy_inner_join(
-	treatments,
-	by = c("time_step" = "begin", "time_step" = "end"),
-	match_fun = list(`>=`, `<`))
+	      treatments,
+	      by = c("time_step" = "begin", "time_step" = "end"),
+	      match_fun = list(`>=`, `<`))
     firing_data_noise <- firing_data_noise |>
       fuzzyjoin::fuzzy_inner_join(
-	treatments,
-	by = c("time_step" = "begin", "time_step" = "end"),
-	match_fun = list(`>=`, `<`))
+	      treatments,
+	      by = c("time_step" = "begin", "time_step" = "end"),
+	      match_fun = list(`>=`, `<`))
   } else {
     if (verbose) {
       cat("Didn't load any treatment information because treatment is NULL\n")
