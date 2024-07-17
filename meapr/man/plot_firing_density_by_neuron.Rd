@@ -6,8 +6,9 @@
 \usage{
 plot_firing_density_by_neuron(
   experiment,
+  include_noise = FALSE,
   plot_width = 10,
-  plot_height = 4,
+  plot_height = NULL,
   output_base = "product/plots",
   verbose = FALSE
 )
@@ -16,9 +17,12 @@ plot_firing_density_by_neuron(
 \item{experiment}{\link{meapr-experiment} data set loaded with
 \link{load_experiment_matlab} or \link{load_experiment_phy}}
 
+\item{include_noise}{\code{logical} included noise units in the plot?}
+
 \item{plot_width}{\code{numeric} width of the output plot}
 
-\item{plot_height}{\code{numeric} height of the output plot}
+\item{plot_height}{\code{numeric} height of the output plot. If \code{include_noise},
+the default is \code{10}, otherwise \code{4}.}
 
 \item{verbose}{\code{logical} print out verbose output.}
 }

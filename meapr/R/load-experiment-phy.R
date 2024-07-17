@@ -56,7 +56,7 @@ load_experiment_phy <- function(
   if (!is.null(save_path)) {
     if (!dir.exists(save_path)) {
       if (verbose) {
-	cat("Creating save path '", save_path, "' ...\n", sep = "")
+        cat("Creating save path '", save_path, "' ...\n", sep = "")
       }
       dir.create(save_path)
     }
@@ -87,8 +87,8 @@ load_experiment_phy <- function(
     np$load(paste0(data_path, "/channel_positions.npy")) |>
       as.data.frame() |>
       dplyr::rename(
-	channel_position_X = V1,
-	channel_position_Y = V2),
+        channel_position_X = V1,
+        channel_position_Y = V2),
     channel_shanks = np$load(
       paste0(data_path, "/channel_shanks.npy")))
 
@@ -114,12 +114,15 @@ load_experiment_phy <- function(
 
   firing_data <- tibble::tibble(
     neuron_index = spike_clusters <- np$load(
-      paste0(data_path, "/spike_clusters.npy")),
+      paste0(data_path, "/spike_clusters.npy")) |>
+      as.numeric(),
     template_id = spike_templates <- np$load(
-      paste0(data_path, "/spike_templates.npy")),
-    time_step = np$load(paste0(data_path, "/spike_times.npy")) /
+      paste0(data_path, "/spike_templates.npy")) |>
+      as.numeric(),
+    time_step = as.numeric(np$load(paste0(data_path, "/spike_times.npy"))) /
       time_steps_per_second,
-    amplitude = np$load(paste0(data_path, "/amplitudes.npy")))
+    amplitude = np$load(paste0(data_path, "/amplitudes.npy")) |>
+      as.numeric())
 
 
   firing_data_noise <- firing_data |>
