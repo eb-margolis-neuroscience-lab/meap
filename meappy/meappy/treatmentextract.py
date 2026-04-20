@@ -2,7 +2,7 @@
 #Generates the "treatments.csv" File in the current directory
 #Run with "python treatmentextract.py [Save Spikes filename]"
 #Created EBM 9-17-2022
-#Edited EBM 10-28-2022
+#Edited EBM 2-23-2025
 
 import sys, os
 import pandas as pd
@@ -17,12 +17,15 @@ try:
 except:
     print(f"Error: Missing command line argument with filename path for modat_spike_freq CSV.") 
 output_dir = os.path.dirname(input_filepath)
-output_file = os.path.join(output_dir, 'treatments.tsv')
+splitonchar = "."
+expt_ID = input_filepath.split(splitonchar)[0]
+output_file = os.path.join(output_dir, expt_ID + '.treatments.tsv')
+print (output_file)
     
 #create global dataframe from the input file, clean up to draft treatments
-pddata = pd.read_csv(open(input_filepath), skiprows = 2, header = 0, usecols = [0,1,2], \
-                     dtype={"time_secs": float, "phase": str, "ch1": str}, engine='python' 
-                    )
+pddata = pd.read_csv(open(input_filepath
+    ), skiprows = 2, header = 0, usecols = [0,1,2], \
+                     dtype={"time_secs": float, "phase": str, "ch1": str}, engine='python')
 dataextract = pddata[~pddata['phase'].isnull()]
 dataextract = dataextract[~dataextract['time_secs'].isnull()]
 lastrow = pd.DataFrame({'time_secs':[pddata['time_secs'].max()], 'phase':['END']})
