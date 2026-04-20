@@ -1,6 +1,6 @@
 library(rstan)
 
-#' Model Average Firing rate as a Function of Treatment Using Log-Poisson
+#' Model Average Firing Rate as a Function of Treatment Using Log-Poisson
 #'  Regression
 #'
 #'
@@ -38,15 +38,30 @@ model_treatment_log_poisson <- function(
     dplyr::group_by(neuron_index, treatment) |>
     dplyr::summarize(
       count = dplyr::n(),
-      exposure = end[1] - begin[1]) |>
-    dplyr::ungroup()
+      exposure = end[1] - begin[1],
+      .groups = "drop")
 
+  n_treatments <- exposure_counts |>
+    dplyr::distinct(treatment) |>
+    nrow()
+
+  n_neurons <- exposure_counts |>
+    dplyr::distinct(neuron_index) |>
+    nrow()
 
   if (verbose) {
     cat(
       "Fitting log-poisson model for firing counts for experiment ",
-      "'", experiment$tag, "'\n", sep = "")
+      "'", experiment$tag, "' with ",
+      "'", n_treatments, "' treatments and ",
+      "'", n_neurons, "' neurons\n", sep = "")
   }
+
+  if ((n_treatments < 2) | (n_neurons < 2)) {
+    warning("Need at least 2 treatments and 2 neurons\n")
+    return(NULL)
+  }
+
 
   if (!is.na(output_base)) {
     model_path <- paste0(

@@ -27,7 +27,7 @@ plot_stable_baseline(
 \item{verbose}{\code{logical} print out verbose output.}
 
 \item{event_reshold}{\code{numeric} how many events should be used to set the
-baseline treshold}
+baseline threshold}
 }
 \value{
 : \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
@@ -39,5 +39,12 @@ while for use in an a manuscript having the vector version means that it`
 can be tweaked with illustrator
 }
 \description{
-Plot Baseline Firing density to evaluate the stability
+The baseline firing rate can be used to evaluate whether or not
+the unit is firing enough before the treatment to evaluate treatment
+effects. Since baselines firing rates may not be stable over time, there
+is a trade-off of collecting a baseline for a short time to be less biased
+or for a long time to have less variance. This plot shows how as the time
+is of the baseline treatment is shortened, how the estimate changes. Using
+a minimum threshold for the number of firing events <event_threshold>,
+units are classified as either keep/not-keep in the plot.
 }

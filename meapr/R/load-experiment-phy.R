@@ -5,6 +5,9 @@
 #' sorter data can be exported in phy format. This function will load data from
 #' the export in the `*.modat.GUI/` folder
 #'
+#' The data is loaded into a list that has fields \[tag, treatment, firings,
+#' waveform\].
+#'
 #' @param treatments `data.frame` or `character`. See [load_treatments_file]
 #'   for details.
 #'
@@ -14,7 +17,7 @@
 #'
 #' @param experiment_tag `character` an identifier for the experiment, set
 #'   in the return data structure and path to save to disk.
-#'
+#' @param time_steps_per_second numeric number of time steps per second.
 #' @param save_path `character` file path where loaded data set should be
 #'   cached: `<save_path>/<experiment_tag>`
 #' @param verbose `logical` print out verbose output
@@ -23,7 +26,9 @@
 #'   \itemize{
 #'     \item{\strong{tag: }}{<experiment_tag>}
 #'     \item{\strong{treatment: }}{\code{\link[tibble]{tibble}} with columns
-#'       \code{[treatment, begin, end]}}
+#'       \code{[treatment, begin, end]}} where treatment is a treatment
+#'       identifier, and begin and end are the time points in seconds of the
+#'       beginning and ending of the treatment.
 #'     \item{\strong{firings: }}{\code{\link[tibble]{tibble}} with columns
 #'       \code{[neuron_index, time_step, treatment, begin, end]} and a row for
 #'       each detected firing}
@@ -36,11 +41,11 @@ load_experiment_phy <- function(
     data_path,
     treatments,
     experiment_tag = NULL,
-    time_steps_per_second = 1,
+    time_steps_per_second = 20000,
     save_path = "intermediate_data/experiment_datasets",
     verbose = FALSE) {
 
-  treatments <- load_treatments_file(treatments)
+  treatments <- load_treatments_file(treatments, verbose)
 
   if (is.null(experiment_tag)) {
     experiment_tag <- data_path |>
@@ -69,8 +74,8 @@ load_experiment_phy <- function(
   if (!stringr::str_detect(data_path, ".modat.GUI$")) {
     warning(
       paste0(
-	      "Expected the data path to have extension '.modat.GUI'. Instead ",
-	      "the data path is '", data_path, "'"))
+              "Expected the data path to have extension '.modat.GUI'. Instead ",
+              "the data path is '", data_path, "'"))
   }
 
   # check that numpy can be loaded via reticulate
@@ -115,7 +120,7 @@ load_experiment_phy <- function(
   firing_data <- tibble::tibble(
     neuron_index = spike_clusters <- np$load(
       paste0(data_path, "/spike_clusters.npy")) |>
-      as.numeric(),
+      as.integer(),
     template_id = spike_templates <- np$load(
       paste0(data_path, "/spike_templates.npy")) |>
       as.numeric(),
@@ -128,13 +133,13 @@ load_experiment_phy <- function(
   firing_data_noise <- firing_data |>
     dplyr::semi_join(
       neuron_data |>
-	      dplyr::filter(group == "noise"),
+              dplyr::filter(group == "noise"),
       by = "neuron_index")
 
   firing_data <- firing_data |>
     dplyr::semi_join(
       neuron_data |>
-	      dplyr::filter(group == "good"),
+              dplyr::filter(group == "good"),
       by = "neuron_index")
 
   if (verbose) {
@@ -161,14 +166,14 @@ load_experiment_phy <- function(
   if (!is.null(treatments)) {
     firing_data <- firing_data |>
       fuzzyjoin::fuzzy_inner_join(
-	      treatments,
-	      by = c("time_step" = "begin", "time_step" = "end"),
-	      match_fun = list(`>=`, `<`))
+              treatments,
+              by = c("time_step" = "begin", "time_step" = "end"),
+              match_fun = list(`>=`, `<`))
     firing_data_noise <- firing_data_noise |>
       fuzzyjoin::fuzzy_inner_join(
-	      treatments,
-	      by = c("time_step" = "begin", "time_step" = "end"),
-	      match_fun = list(`>=`, `<`))
+              treatments,
+              by = c("time_step" = "begin", "time_step" = "end"),
+              match_fun = list(`>=`, `<`))
   } else {
     if (verbose) {
       cat("Didn't load any treatment information because treatment is NULL\n")

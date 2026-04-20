@@ -38,46 +38,52 @@ plot_firing_density_by_neuron <- function(
     return(NULL)
   }
 
-    data <- experiment$firing |>
-      dplyr::select(neuron_index, time_step) |>
-      dplyr::mutate(group = "Good Units", .before = 1)
+  data <- experiment$firing |>
+    dplyr::select(neuron_index, time_step) |>
+    dplyr::mutate(group = "Good Units", .before = 1)
 
+  if (include_noise) {
+    data <- dplyr::bind_rows(
+      data,
+      experiment$firing_noise |>
+        dplyr::select(neuron_index, time_step) |>
+        dplyr::mutate(group = "Noise Units", .before = 1))
+  }
+
+  if (is.null(plot_height)) {
     if (include_noise) {
-      data <- dplyr::bind_rows(
-        data,
-        experiment$firing_noise |>
-          dplyr::select(neuron_index, time_step) |>
-          dplyr::mutate(group = "Noise Units", .before = 1))
+      plot_height <- 10
+    } else {
+      plot_height <- 4
     }
-    
-    if (is.null(plot_height)) {
-      if (include_noise) {
-        plot_height <- 10
-      } else {
-        plot_height <- 4
-      }
-    }
-    
-    data <- data |>
-      dplyr::group_by(group, neuron_index) |>
-      dplyr::do({
-        data_neuron <- .
-        density_estimate <- stats::density(
-          x = data_neuron$time_step,
-          from = experiment$treatments$begin |> min(),
-          to = experiment$treatments$end |> max(),
-          adjust = .01,
-          n = 1000)
-        tibble::tibble(
-          group = data_neuron$group[1],
-          neuron_index = data_neuron$neuron_index[1],
-          time_step = density_estimate$x,
-          firing_density = density_estimate$y) |>
-          dplyr::mutate(
-            normalized_log_firing_density =
-              log(firing_density / max(firing_density) + 1))
-      }) |>
-      dplyr::ungroup()
+  }
+
+  data <- data |>
+    dplyr::group_by(group, neuron_index) |>
+    dplyr::do({
+      data_neuron <- .
+      density_estimate <- stats::density(
+        x = data_neuron$time_step,
+        from = experiment$treatments$begin |> min(),
+        to = experiment$treatments$end |> max(),
+        adjust = .01,
+        n = 1000)
+      density_estimate <- tibble::tibble(
+        group = data_neuron$group[1],
+        neuron_index = data_neuron$neuron_index[1],
+        time_step = density_estimate$x,
+        firing_density = density_estimate$y)
+      #density_estimate <- density_estimate |>
+      #  dplyr::mutate(
+      #    normalized_log_firing_density =
+      #      log(firing_density / max(firing_density) + 1))
+      density_estimate
+    }) |>
+    dplyr::ungroup()
+
+  data <- data |>
+    dplyr::mutate(
+      normalized_log_firing_density = log10(firing_density + .001))
 
   p <- ggplot2::ggplot(data = data) +
     ggplot2::theme_bw() +
@@ -107,13 +113,15 @@ plot_firing_density_by_neuron <- function(
         name = NULL,
         breaks = with(experiment$treatments, begin + (end - begin) / 2),
         labels = experiment$treatments$treatment)) +
-    ggplot2::scale_y_discrete( 
+    ggplot2::scale_y_discrete(
       name = "Neuron Index",
       expand = c(0, 0)) +
     ggplot2::scale_fill_viridis_c("Per-neuron normalized log firing density") +
-    ggplot2::theme(legend.position = "bottom") +
-    ggplot2::theme()
-  
+    ggplot2::theme(
+      legend.position = "bottom",
+      axis.text.x.top = ggplot2::element_text(
+        angle = 10, hjust = 0.2, vjust = 0.1))
+
   if (include_noise) {
     p <- p +
       ggplot2::facet_grid(
@@ -121,7 +129,7 @@ plot_firing_density_by_neuron <- function(
         space = 'free_y',
         scales = 'free_y')
   }
-  
+
   if (!is.null(output_base)) {
     if (!dir.exists(output_base)) {
       if (verbose) {

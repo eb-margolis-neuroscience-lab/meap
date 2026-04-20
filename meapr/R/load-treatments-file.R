@@ -1,4 +1,69 @@
+#' Parse Concentration
+#'
+#' Parse concentration with SI units into molar units
+#'
+#' @param concentration_string string number formatted as
+#'   "<numeric> <SI units>", where <SI units> is one of
+#'   \[M, mM, μM, uM, nM, pM, fM\]
+#'
+#' @returns numeric molar concentration
+#'
+#' @examples
+#' \dontrun{
+#'   1e-8 == parse_concentration("10 nM")
+#'   1.3e-6 == parse_concentration("1.3 uM")
+#' }
+#'
+#' @export
+parse_concentration <- function(concentration_string) {
+  if (is.na(concentration_string)) {
+    concentration <- NA_real_
+  } else if (concentration_string |> stringr::str_detect(" M$")) {
+    concentration <- concentration_string |>
+      stringr::str_replace(" M", "") |>
+      as.numeric()
+  } else if (concentration_string |> stringr::str_detect("mM$")) {
+    concentration <- concentration_string |>
+      stringr::str_replace("[ ]?mM$", "") |>
+      as.numeric()
+    concentration <- concentration * 1e-3
+  } else if (concentration_string |> stringr::str_detect("μM$")) {
+    concentration <- concentration_string |>
+      stringr::str_replace("[ ]?μM$", "") |>
+      as.numeric()
+    concentration <- concentration * 1e-6
+  } else if (concentration_string |> stringr::str_detect("uM$")) {
+    concentration <- concentration_string |>
+      stringr::str_replace("[ ]?uM$", "") |>
+      as.numeric()
+    concentration <- concentration * 1e-6
+  } else if (concentration_string |> stringr::str_detect("nM$")) {
+    concentration <- concentration_string |>
+      stringr::str_replace("[ ]?nM", "") |>
+      as.numeric()
+    concentration <- concentration * 1e-9
+  } else if (concentration_string |> stringr::str_detect("pM$")) {
+    concentration <- concentration_string |>
+      stringr::str_replace("[ ]?pM", "") |>
+      as.numeric()
+    concentration <- concentration * 1e-12
+  } else if (concentration_string |> stringr::str_detect("fM$")) {
+    concentration <- concentration_string |>
+      stringr::str_replace("[ ]?fM", "") |>
+      as.numeric()
+    concentration <- concentration * 1e-15
+  } else {
+    warning(
+      paste0(
+        "Unrecognized format for concentration '", concentration_string, "', ",
+        "unable to parse."))
+    concentration <- NA_real_
+  }
+  concentration
+}
+
 #' Load treatments file
+#'
 #'
 #' @description A treatments data table has columns `begin`, and `end`, and
 #'   `treatment`, where `begin` and `end` are the time-points in seconds when
@@ -10,6 +75,7 @@
 #'   of the experiment. If it is a `character` it should be a path to a `.tsv`
 #'   file with the same columns. To help detect problems, an warning is given
 #'   if the treatments are not disjoint and given chronologically.
+#'
 #' @param verbose `logical` print out verbose output
 #'
 #' @returns `data.frame` with treatment information. See Description for the
@@ -41,6 +107,7 @@ load_treatments_file <- function(
         index = label |>
           stringr::str_extract("^[0-9]+") |>
           as.numeric(),
+        index = index * units_Hz,
         treatment = label |>
           stringr::str_replace("^[0-9]+_", ""),
         is_washout = tolower(treatment) == "washout",
@@ -59,11 +126,26 @@ load_treatments_file <- function(
     cat("found '", nrow(treatments), "' treatments\n", sep = "")
   }
 
-  # check each treatment is well formed
+  # check each treatment has defined beginning and end points
   for (i in seq_len(nrow(treatments))) {
-    if (!is.na(treatments$begin[i]) &&
-       !is.na(treatments$end[i]) &&
-       (treatments$begin[i] >= treatments$end[i])) {
+    if (is.na(treatments$begin[i])) {
+      stop(paste0(
+        "For treatment '", i, "'='", treatments$treatment[i], "'",
+        " the beginning of the treatment must not be NA\n"))
+    }
+  }
+
+  # the last end point can be undefined
+  for (i in seq_len(nrow(treatments) - 1)) {
+    if (is.na(treatments$end[i])) {
+      stop(paste0(
+        "For treatment '", i, "'='", treatments$treatment[i], "'",
+        " the end of the treatment must not be NA\n"))
+    }
+  }
+
+  for (i in seq_len(nrow(treatments) - 1)) {
+    if (treatments$begin[i] >= treatments$end[i]) {
       stop(paste0(
         "treatment '", i, "'='", treatments$treatment[i], "'",
         " has begin='", treatments$begin[i], "' >=",

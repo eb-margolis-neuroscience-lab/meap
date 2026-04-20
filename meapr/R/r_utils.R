@@ -11,3 +11,4 @@ date_code <- function(d = NA) {
     sub(pattern, "\\1", d), sub(pattern, "\\2", d), sub(pattern, "\\3", d),
     sep = "")
 }
+

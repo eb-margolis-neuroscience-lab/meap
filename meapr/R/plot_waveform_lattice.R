@@ -25,12 +25,33 @@ plot_waveform_lattice <- function(
   plot_height = 10,
   output_base = "product/plots",
   verbose = FALSE) {
+  
+  if (
+    !("waveform" %in% names(experiment)) ||
+    "data.frame" %in% class(experiment$waveform)) {
+    warning(paste0(
+      "Expected experiment$waveform to be a data.frame and have columns ",
+      "[neuron_index, time_step, voltage]."))
+  }
+  
+  if (
+    !("neuron_index" %in% names(experiment$waveform)) ||
+    !("time_step" %in% names(experiment$waveform)) ||
+    !("voltage" %in% names(experiment$waveform))) {
+    stop(paste0(
+      "Expected experiment$waveform to have columns ",
+      "[neuron_index, time_step, voltage]. Instead it has columns ",
+      "[", paste0(names(experiment$waveform), collapse = ", "), "]"))
+  }
+  
 
   p <- ggplot2::ggplot(data = experiment$waveform) +
     ggplot2::theme_bw() +
     ggplot2::geom_line(mapping = ggplot2::aes(x = time_step, y = voltage)) +
     ggplot2::facet_wrap(~neuron_index) +
-    ggplot2::ggtitle("Neuron waveform cluster mean", subtitle = experiment$tag) +
+    ggplot2::ggtitle(
+      "Neuron waveform cluster mean",
+      subtitle = experiment$tag) +
     ggplot2::scale_x_continuous("microsecond") +
     ggplot2::scale_y_continuous("Voltage")
 

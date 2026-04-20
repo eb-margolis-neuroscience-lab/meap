@@ -8,7 +8,7 @@ load_experiment_phy(
   data_path,
   treatments,
   experiment_tag = NULL,
-  time_steps_per_second = 1,
+  time_steps_per_second = 20000,
   save_path = "intermediate_data/experiment_datasets",
   verbose = FALSE
 )
@@ -24,6 +24,8 @@ for details.}
 \item{experiment_tag}{\code{character} an identifier for the experiment, set
 in the return data structure and path to save to disk.}
 
+\item{time_steps_per_second}{numeric number of time steps per second.}
+
 \item{save_path}{\code{character} file path where loaded data set should be
 cached: \verb{<save_path>/<experiment_tag>}}
 
@@ -34,7 +36,9 @@ cached: \verb{<save_path>/<experiment_tag>}}
 \itemize{
 \item{\strong{tag: }}{<experiment_tag>}
 \item{\strong{treatment: }}{\code{\link[tibble]{tibble}} with columns
-\code{[treatment, begin, end]}}
+\code{[treatment, begin, end]}} where treatment is a treatment
+identifier, and begin and end are the time points in seconds of the
+beginning and ending of the treatment.
 \item{\strong{firings: }}{\code{\link[tibble]{tibble}} with columns
 \code{[neuron_index, time_step, treatment, begin, end]} and a row for
 each detected firing}
@@ -47,4 +51,7 @@ each detected firing}
 framework for electrophysiology data. For example, the SpyKING Circus spike
 sorter data can be exported in phy format. This function will load data from
 the export in the \verb{*.modat.GUI/} folder
+
+The data is loaded into a list that has fields [tag, treatment, firings,
+waveform].
 }
