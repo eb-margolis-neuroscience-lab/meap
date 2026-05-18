@@ -1,0 +1,20 @@
+#' meapr experiment object
+#'
+#' An S3 class representing an experiment in the meapr package. To load an
+#' experiment, use [meapr::load_experiment_phy()] and has the following
+#' components:
+#'  \itemize{
+#'     \item{\strong{tag: }}{<experiment_tag>}
+#'     \item{\strong{treatment: }}{\code{\link[tibble]{tibble}} with columns
+#'       \code{[treatment, begin, end]}} where treatment is a treatment
+#'       identifier, and begin and end are the time points in seconds of the
+#'       beginning and ending of the treatment.
+#'     \item{\strong{firings: }}{\code{\link[tibble]{tibble}} with columns
+#'       \code{[neuron_index, time_step, treatment, begin, end]} and a row for
+#'       each detected firing}
+#'     \item{\strong{waveform: }}{\code{\link[tibble]{tibble}} with columns
+#'       \code{[neuron_index, time_step, voltage]} for each neuron}
+#'   }
+#'
+#' @name experiment
+NULL
