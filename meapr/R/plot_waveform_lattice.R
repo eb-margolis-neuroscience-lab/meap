@@ -6,9 +6,12 @@
 #' @param experiment [meapr-experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #'
-#' @param plot_width `numeric` width of the output plot
-#' @param plot_height `numeric` height of the output plot
-#' @param verbose `logical` print out verbose output
+#' @param extra_layers `list` extra ggplot2 layers to be added to the plot
+#'   before saving it.
+#' @param plot_width `numeric` width of the output plot.
+#' @param plot_height `numeric` height of the output plot.
+#' @param output_base `character` where to output plots.
+#' @param verbose `logical` print out verbose output.
 #'
 #' @returns: [ggplot2::ggplot] of the plot and it saves the result to
 #'   `product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.pdf`
@@ -21,11 +24,24 @@
 #'@export
 plot_waveform_lattice <- function(
   experiment,
+  extra_layers = list(),
   plot_width = 10,
   plot_height = 10,
   output_base = "product/plots",
   verbose = FALSE) {
   
+  if (!is.null(output_base)) {
+    if (!dir.exists(output_base)) {
+      if (verbose) {
+        cat("creating output directory '", output_base, "'\n", sep = "")
+      }
+      dir.create(
+        output_base,
+        showWarnings = FALSE,
+        recursive = TRUE)
+    }
+  }
+
   if (
     !("waveform" %in% names(experiment)) ||
     "data.frame" %in% class(experiment$waveform)) {
@@ -53,18 +69,10 @@ plot_waveform_lattice <- function(
       "Neuron waveform cluster mean",
       subtitle = experiment$tag) +
     ggplot2::scale_x_continuous("microsecond") +
-    ggplot2::scale_y_continuous("Voltage")
+    ggplot2::scale_y_continuous("Voltage") +
+    extra_layers
 
   if (!is.null(output_base)) {
-    if (!dir.exists(output_base)) {
-      if (verbose) {
-        cat("creating output directory '", output_base, "'\n", sep = "")
-      }
-      dir.create(
-        output_base,
-        showWarnings = FALSE,
-        recursive = TRUE)
-    }
 
     pdf_path <- paste0(
       output_base, "/waveform_lattice_", experiment$tag,

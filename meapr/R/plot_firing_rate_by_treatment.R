@@ -11,8 +11,11 @@
 #' @param experiment [meapr-experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #'
+#' @param extra_layers `list` extra ggplot2 layers to be added to the plot
+#'   before saving it.
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot
+#' @param output_base `character` where to output plots
 #' @param verbose `logical` print out verbose output
 #'
 #' @returns: [ggplot2::ggplot] of the plot and it saves the result to
@@ -24,10 +27,23 @@
 #'@export
 plot_firing_rate_by_treatment <- function(
   experiment,
+  extra_layers = list()
   plot_width = 6,
   plot_height = 6,
   output_base = "product/plots",
   verbose = FALSE) {
+
+  if (!is.null(output_base)) {
+    if (!dir.exists(output_base)) {
+      if (verbose) {
+        cat("creating output directory '", output_base, "'\n", sep = "")
+      }
+      dir.create(
+        output_base,
+        showWarnings = FALSE,
+        recursive = TRUE)
+    }
+  }
 
   exposure_counts <- experiment$firing |>
     dplyr::mutate(treatment = factor(
@@ -56,18 +72,10 @@ plot_firing_rate_by_treatment <- function(
       "Neuron Firing Rate by Treatment",
       subtitle = experiment$tag) +
     ggplot2::scale_x_discrete("Treatment") +
-    scale_y_log_firing_rate()
+    scale_y_log_firing_rate() +
+    extra_layer
 
   if (!is.null(output_base)) {
-    if (!dir.exists(output_base)) {
-      if (verbose) {
-        cat("creating output directory '", output_base, "'\n", sep = "")
-      }
-      dir.create(
-        output_base,
-        showWarnings = FALSE,
-        recursive = TRUE)
-    }
 
     pdf_path <- paste0(
       output_base, "/firing_rate_by_treatment_", experiment$tag,

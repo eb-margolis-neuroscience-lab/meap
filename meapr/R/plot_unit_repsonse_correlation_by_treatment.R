@@ -8,9 +8,12 @@
 #' @param experiment [meapr-experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #'
-#' @param plot_width `numeric` width of the output plot
-#' @param plot_height `numeric` height of the output plot
-#' @param verbose `logical` print out verbose output
+#' @param extra_layers `list` extra ggplot2 layers to be added to the plot
+#'   before saving it.
+#' @param plot_width `numeric` width of the output plot.
+#' @param plot_height `numeric` height of the output plot.
+#' @param output_base `character` where to output plots.
+#' @param verbose `logical` print out verbose output.
 #'
 #' @returns: [ggplot2::ggplot] of the plot and it saves the result to
 #'   `product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.(pdf|png)`
@@ -21,10 +24,21 @@
 #'@export
 plot_unit_response_by_treatment <- function(
   experiment,
+  extar_layers = list(),
   plot_width = 10,
   plot_height = 10,
   output_base = "product/plots",
   verbose = FALSE) {
+
+  if (!dir.exists(output_base)) {
+    if (verbose) {
+      cat("creating output directory '", output_base, "'\n", sep = "")
+    }
+    dir.create(
+      output_base,
+      showWarnings = FALSE,
+      recursive = TRUE)
+  }
 
   exposure_counts <- experiment$firing |>
     dplyr::group_by(neuron_index, treatment) |>
@@ -34,23 +48,15 @@ plot_unit_response_by_treatment <- function(
     tidyr::spread(key = "treatment", value = "log_firing_rate", fill = 0) |>
     dplyr::select(-neuron_index)
 
+  p <- GGally::ggpairs(
+    data = exposure_counts,
+    title = paste0(
+      "Correlation of unit response by treatment: ", experiment$tag),
+    xlab = "Log(Firing Rate)",
+    ylab = "Log(Firing Rate)") +
+    extra_layers
+  
   if (!is.null(output_base)) {
-    if (!dir.exists(output_base)) {
-      if (verbose) {
-  cat("creating output directory '", output_base, "'\n", sep = "")
-      }
-      dir.create(
-        output_base,
-        showWarnings = FALSE,
-        recursive = TRUE)
-    }
-
-    p <- GGally::ggpairs(
-      data = exposure_counts,
-      title = paste0(
-        "Correlation of unit response by treatment: ", experiment$tag),
-      xlab = "Log(Firing Rate)",
-      ylab = "Log(Firing Rate)")
 
     pdf_path <- paste0(
       output_base, "/plot_unit_response_by_treatment_", experiment$tag,
@@ -84,4 +90,5 @@ plot_unit_response_by_treatment <- function(
     print(p)
     grDevices::dev.off()
   }
+  invisible(p)
 }

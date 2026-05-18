@@ -10,10 +10,11 @@
 #'
 #' @param experiment [meapr-experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
-#'
+#' @param bins `numeric` number of histogram bins to use
+#' @param extra_layers `list` extra ggplot2 layers to be added to the plot
+#'   before saving it.
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot
-#' @param bins `numeric` number of histogram bins to use
 #' @param output_base `character` where to output plots
 #' @param verbose `logical` print out verbose output
 #'
@@ -26,11 +27,24 @@
 #'@export
 plot_firing_rate_by_neuron <- function(
   experiment,
+  bins = 30,
+  extra_layer = list(),
   plot_width = 7,
   plot_height = 4,
-  bins = 30,
   output_base = "product/plots",
   verbose = FALSE) {
+
+  if (!is.null(output_base)) {
+    if (!dir.exists(output_base)) {
+      if (verbose) {
+        cat("creating output directory '", output_base, "'\n", sep = "")
+      }
+      dir.create(
+        output_base,
+        showWarnings = FALSE,
+        recursive = TRUE)
+    }
+  }
 
   total_exposure <- experiment$treatment |>
     dplyr::mutate(exposure = end[1] - begin[1]) |>
@@ -51,19 +65,11 @@ plot_firing_rate_by_neuron <- function(
       "Per-neuron firing rate",
       subtitle = experiment$tag) +
     scale_x_log_firing_rate() +
-    ggplot2::scale_y_continuous("Neuron Count")
+    ggplot2::scale_y_continuous("Neuron Count") +
+    extra_layers
 
 
   if (!is.null(output_base)) {
-    if (!dir.exists(output_base)) {
-      if (verbose) {
-        cat("creating output directory '", output_base, "'\n", sep = "")
-      }
-      dir.create(
-        output_base,
-        showWarnings = FALSE,
-        recursive = TRUE)
-    }
 
     pdf_path <- paste0(
       output_base, "/firing_rate_by_neuron_", experiment$tag,

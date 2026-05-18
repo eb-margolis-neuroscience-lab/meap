@@ -16,8 +16,11 @@
 #' @param baseline_treatment_name `character` name of the baseline treatment
 #' @param event_reshold `numeric` how many events should be used to set the
 #'   baseline threshold
-#' @param plot_width `numeric` width of the output plot
-#' @param plot_height `numeric` height of the output plot
+#' @param extra_layers `list` extra ggplot2 layers to be added to the plot
+#'   before saving it.
+#' @param plot_width `numeric` width of the output plot.
+#' @param plot_height `numeric` height of the output plot.
+#' @param output_base `character` where to output plots.
 #' @param verbose `logical` print out verbose output.
 #'
 #' @returns: [ggplot2::ggplot] of the plot and it saves the result to
@@ -34,10 +37,23 @@ plot_stable_baseline <- function(
     experiment,
     baseline_treatment_name = "baseline",
     event_threshold = 200,
+    extra_layers = list(),
     plot_width = 10,
     plot_height = 4,
     output_base = "product/plots",
     verbose = FALSE) {
+
+  if (!is.null(output_base)) {
+    if (!dir.exists(output_base)) {
+      if (verbose) {
+        cat("creating output directory '", output_base, "'\n", sep = "")
+      }
+      dir.create(
+        output_base,
+        showWarnings = FALSE,
+        recursive = TRUE)
+    }
+  }
 
   if (!(baseline_treatment_name %in% experiment$treatments$treatment)) {
     stop(
@@ -106,18 +122,10 @@ plot_stable_baseline <- function(
       subtitle = experiment$tag) +
     ggplot2::scale_x_continuous("Time Step (s)") +
     ggplot2::scale_color_discrete("Stable Unit") +
-    scale_y_log_firing_rate()
+    scale_y_log_firing_rate() +
+    extra_layers
 
   if (!is.null(output_base)) {
-    if (!dir.exists(output_base)) {
-      if (verbose) {
-        cat("creating output directory '", output_base, "'\n", sep = "")
-      }
-      dir.create(
-        output_base,
-        showWarnings = FALSE,
-        recursive = TRUE)
-    }
 
     pdf_path <- paste0(
       output_base, "/stable_baseline_", experiment$tag,

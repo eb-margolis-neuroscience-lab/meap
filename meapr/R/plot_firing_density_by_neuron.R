@@ -7,15 +7,18 @@
 #' @param experiment [meapr-experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #' @param include_noise `logical` included noise units in the plot?
+#' @param extra_layers `list` extra ggplot2 layers to be added to the plot
+#'   before saving it.
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot. If `include_noise`,
 #'   the default is `10`, otherwise `4`.
+#' @param output_base `character` the folder where the plot will be saved
 #' @param verbose `logical` print out verbose output.
 #'
 #' @returns: [ggplot2::ggplot] of the plot and it saves the result to
-#'   `product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.pdf`
+#'   `<output_base>/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.pdf`
 #'   and
-#'   `product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.png`
+#'   `<output_base>/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.png`
 #'   It save both .pdf and .png because it's easier to email etc small pngs
 #'   while for use in an a manuscript having the vector version means that it`
 #'   can be tweaked with illustrator
@@ -25,11 +28,24 @@
 plot_firing_density_by_neuron <- function(
   experiment,
   include_noise = FALSE,
+  extra_layers = list(),
   plot_width = 10,
   plot_height = NULL,
   output_base = "product/plots",
   verbose = FALSE) {
 
+  if (!is.null(output_base)) {
+    if (!dir.exists(output_base)) {
+      if (verbose) {
+        cat("creating output directory '", output_base, "'\n", sep = "")
+      }
+      dir.create(
+        output_base,
+        showWarnings = FALSE,
+        recursive = TRUE)
+    }
+  }
+  
   if (nrow(experiment$firing) == 0) {
     warning(paste0(
       "For experiment '", experiment$tag, "' ",
@@ -120,7 +136,8 @@ plot_firing_density_by_neuron <- function(
     ggplot2::theme(
       legend.position = "bottom",
       axis.text.x.top = ggplot2::element_text(
-        angle = 10, hjust = 0.2, vjust = 0.1))
+        angle = 10, hjust = 0.2, vjust = 0.1)) +
+    extra_layers
 
   if (include_noise) {
     p <- p +
@@ -131,15 +148,6 @@ plot_firing_density_by_neuron <- function(
   }
 
   if (!is.null(output_base)) {
-    if (!dir.exists(output_base)) {
-      if (verbose) {
-        cat("creating output directory '", output_base, "'\n", sep = "")
-      }
-      dir.create(
-        output_base,
-        showWarnings = FALSE,
-        recursive = TRUE)
-    }
 
     pdf_path <- paste0(
       output_base, "/firing_density_by_neuron_", experiment$tag,

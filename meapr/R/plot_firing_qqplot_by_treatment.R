@@ -20,6 +20,8 @@
 #'
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot
+#' @param extra_layers `list` extra ggplot2 layers to be added to the plot
+#'   before saving it.
 #' @param verbose `logical` print out verbose output
 #'
 #' @returns: [ggplot2::ggplot] of the plot and it saves the result to
@@ -32,10 +34,24 @@
 plot_firing_qqplot_by_treatment <- function(
   experiment,
   highlight_units = NULL,
+  extra_layers = list(),
   plot_width = 7,
   plot_height = 4,
   output_base = "product/plots",
   verbose = FALSE) {
+
+
+  if (!is.null(output_base)) {
+    if (!dir.exists(output_base)) {
+      if (verbose) {
+        cat("creating output directory '", output_base, "'\n", sep = "")
+      }
+      dir.create(
+        output_base,
+        showWarnings = FALSE,
+        recursive = TRUE)
+    }
+  }
 
   data <- experiment$firing |>
     dplyr::mutate(treatment = factor(
@@ -98,17 +114,10 @@ plot_firing_qqplot_by_treatment <- function(
         size = 2.5)
   }
 
+  plot <- plot + extra_layers
+
 
   if (!is.null(output_base)) {
-    if (!dir.exists(output_base)) {
-      if (verbose) {
-  cat("creating output directory '", output_base, "'\n", sep = "")
-      }
-      dir.create(
-    output_base,
-    showWarnings = FALSE,
-    recursive = TRUE)
-    }
 
     pdf_path <- paste0(
       output_base, "/firing_qqplot_by_treatment_", experiment$tag,

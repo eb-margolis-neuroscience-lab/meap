@@ -64,6 +64,9 @@ model_treatment_log_poisson <- function(
 
 
   if (!is.na(output_base)) {
+    if (!dir.exists(output_base)) {
+      dir.create(output_base, recursive = TRUE)
+    }
     model_path <- paste0(
       output_base, "/model_log_poisson_", experiment$tag, ".stan")
     cat("Saving stan model to '", model_path, "'\n", sep = "")
