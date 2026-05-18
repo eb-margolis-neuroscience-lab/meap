@@ -4,7 +4,7 @@
 #'   is time measured in seconds and the y-axis are the neuron index. The
 #'   duration of treatment interval is marked.
 #'
-#' @param experiment [meapr-experiment] data set loaded with
+#' @param experiment [meapr::experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #' @param include_noise `logical` included noise units in the plot?
 #' @param extra_layers `list` extra ggplot2 layers to be added to the plot

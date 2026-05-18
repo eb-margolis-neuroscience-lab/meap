@@ -7,12 +7,12 @@
 norm_firing(exp, baseline_treatment_name = "Baseline")
 }
 \arguments{
-\item{exp}{\link{meapr-experiment}, a \link{meapr} experiment object}
+\item{exp}{\link{experiment}, a \link{meapr} experiment object}
 
 \item{baseline_treatment_name}{\code{character} name of the baseline treatment}
 }
 \value{
-The \link{meapr-experiment} that was passed in as \code{exp}, add an
+The \link{experiment} that was passed in as \code{exp}, add an
 additional column \code{norm_firing_rate} that is the percent of the firing rate
 in the Baseline condition
 }

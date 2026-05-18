@@ -11,7 +11,7 @@ rm_time_off_baseline(
 )
 }
 \arguments{
-\item{exp}{\link{meapr-experiment}, a \link{meapr} experiment object}
+\item{exp}{\link{experiment}, a \link{meapr} experiment object}
 
 \item{baseline_cutoff}{\code{numeric} trim the given amount of the start of the
 baseline}
@@ -19,7 +19,7 @@ baseline}
 \item{baseline_treatment_name}{\code{character} name of the baseline treatment}
 }
 \value{
-The \link{meapr-experiment} that was passed in as \code{exp}, but with the
+The \link{experiment} that was passed in as \code{exp}, but with the
 baseline condition trimmed.
 }
 \description{

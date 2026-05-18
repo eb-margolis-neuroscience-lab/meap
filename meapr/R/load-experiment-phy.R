@@ -1,6 +1,6 @@
 #'Load Firing Data for an Experiment from phy
 #'
-#'@description (Phy)[https://github.com/cortex-lab/phy] is a data exchange
+#'@description [Phy](https://github.com/cortex-lab/phy) is a data exchange
 #' framework for electrophysiology data. For example, the SpyKING Circus spike
 #' sorter data can be exported in phy format. This function will load data from
 #' the export in the `*.modat.GUI/` folder
@@ -22,7 +22,7 @@
 #'   cached: `<save_path>/<experiment_tag>`
 #' @param verbose `logical` print out verbose output
 #'
-#' @returns [meapr-experiment] S3 class with the following elements
+#' @returns [meapr::experiment] S3 class with the following elements
 #'   \itemize{
 #'     \item{\strong{tag: }}{<experiment_tag>}
 #'     \item{\strong{treatment: }}{\code{\link[tibble]{tibble}} with columns

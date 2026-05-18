@@ -28,7 +28,7 @@
 #'   cached: `<save_path>/<experiment_tag>`
 #' @param verbose `logical` print out verbose output.
 #'
-#' @returns [meapr-experiment] S3 class with the following elements
+#' @returns [meapr::experiment] S3 class with the following elements
 #'   \itemize{
 #'     \item{\strong{tag: }}{<experiment_tag>}
 #'     \item{\strong{treatment: }}{\code{\link[tibble]{tibble}} with columns

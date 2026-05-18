@@ -6,26 +6,30 @@
 \usage{
 plot_firing_rate_by_neuron(
   experiment,
+  bins = 30,
+  extra_layer = list(),
   plot_width = 7,
   plot_height = 4,
-  bins = 30,
   output_base = "product/plots",
   verbose = FALSE
 )
 }
 \arguments{
-\item{experiment}{\link{meapr-experiment} data set loaded with
+\item{experiment}{\link{experiment} data set loaded with
 \link{load_experiment_matlab} or \link{load_experiment_phy}}
+
+\item{bins}{\code{numeric} number of histogram bins to use}
 
 \item{plot_width}{\code{numeric} width of the output plot}
 
 \item{plot_height}{\code{numeric} height of the output plot}
 
-\item{bins}{\code{numeric} number of histogram bins to use}
-
 \item{output_base}{\code{character} where to output plots}
 
 \item{verbose}{\code{logical} print out verbose output}
+
+\item{extra_layers}{\code{list} extra ggplot2 layers to be added to the plot
+before saving it.}
 }
 \value{
 : \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to

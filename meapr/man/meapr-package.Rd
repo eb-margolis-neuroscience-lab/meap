@@ -74,6 +74,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Matthew O'Meara \email{maom@umich.edu}
   \item Walter German \email{p.walter.german@gmail.com}
   \item Madeline Martin \email{mmarti29@uoregon.edu}
 }

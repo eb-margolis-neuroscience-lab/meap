@@ -1,11 +1,11 @@
 #' Remove Time Off Baseline
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #' @param baseline_cutoff `numeric` trim the given amount of the start of the
 #'   baseline
 #' @param baseline_treatment_name `character` name of the baseline treatment
 #'
-#' @returns The [meapr-experiment] that was passed in as `exp`, but with the
+#' @returns The [meapr::experiment] that was passed in as `exp`, but with the
 #'   baseline condition trimmed.
 #'
 #' @export
@@ -35,10 +35,10 @@ rm_time_off_baseline <- function(
 
 #' Trim 60 Seconds off of the Beginning of all Treatments Except the Baseline
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #' @param baseline_treatment_name `character` name of the baseline treatment
 #'
-#' @returns The [meapr-experiment] that was passed in as `exp`, but with the
+#' @returns The [meapr::experiment] that was passed in as `exp`, but with the
 #'   each trimmed by 60 seconds
 #'
 #' @export
@@ -60,7 +60,7 @@ rm_60s_treatments <- function(
 
 #' Compute the Firing Rate for Each Treatment
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #'
 #' @returns `data.frame` with one treatment per row, and columns
 #'   * **begin**: beginning time of the treatment (in seconds)
@@ -90,12 +90,12 @@ exposure_counts <- function(exp) {
 
 #' Filter Neurons by the Firing Rate in the Baseline
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #' @param lower `numeric` lower firing rate to filter by (inclusive)
 #' @param upper `numeric` upper firing rate to filter by (inclusive)
 #' @param baseline_treatment_name `character` name of the baseline treatment
 #'
-#' @returns The [meapr-experiment] that was passed in as `exp`, but with only
+#' @returns The [meapr::experiment] that was passed in as `exp`, but with only
 #'   the neurons where the firing rate is within
 #'   `lower <= <firing_rate> <= upper`
 #'
@@ -117,10 +117,10 @@ filter_data_baseline <- function(
 
 #' For Each Neuron, Normalize Firing Rate to Percent Baseline
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #' @param baseline_treatment_name `character` name of the baseline treatment
 #'
-#' @returns The [meapr-experiment] that was passed in as `exp`, add an
+#' @returns The [meapr::experiment] that was passed in as `exp`, add an
 #'   additional column `norm_firing_rate` that is the percent of the firing rate
 #'   in the Baseline condition
 #'
@@ -140,10 +140,10 @@ norm_firing <- function(
 
 #' Add Neuron Identifier as the Experiment Name and Neuron Index
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #' @param exp_name `character` name for the experiment
 #'
-#' @returns The [meapr-experiment] that was passed in as `exp`, with two
+#' @returns The [meapr::experiment] that was passed in as `exp`, with two
 #'   additional column, `exp_id` with the experiment name given in `exp_name`
 #'   and `neuron_id` with the `<exp_name>_<neuron_index>`
 #'
@@ -160,12 +160,12 @@ add_neuron_id <- function(exp, exp_name) {
 
 #' Add Treatment/Control as a Condition Column to an Experiment
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #' @param treatment_label `character` the label for the treatment to be
 #'   labeled as `"treatment"` and everything else will be labeled as
 #'   `"control"`
 #'
-#' @returns The [meapr-experiment] that was passed in as `exp`, with an
+#' @returns The [meapr::experiment] that was passed in as `exp`, with an
 #'   additional column `condition` where which is either `"treatment"` or
 #'   `"control"`, depending on it is the treatment specified in
 #'   `treatment_label`
@@ -184,11 +184,11 @@ label_condition <- function(exp, treatment_label) {
 
 #' Label Each Neuron by it Responsiveness Relative to a Threshold Range
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #' @param min_threshold `numeric` lower firing rate threshold for responsiveness
 #' @param max_threshold `numeric` upper firing rate threshold for responsiveness
 #'
-#' @returns The [meapr-experiment] that was passed in as `exp`, with an
+#' @returns The [meapr::experiment] that was passed in as `exp`, with an
 #'   additional column `responsive` taking values
 #'   `["decreasing", "increasing", "low_response"]`, depending on whether the
 #'   the where the normalized firing rate for the treatment condition below the
@@ -219,10 +219,10 @@ label_responsiveness <- function(
 
 #' Label Neurons That Have a Firing Rate of At least 0.5 Hz in the Baseline
 #'
-#' @param exp [meapr-experiment], a [meapr] experiment object
+#' @param exp [meapr::experiment], a [meapr] experiment object
 #' @param baseline_treatment_name `character` name of the baseline treatment
 #'
-#' @returns The [meapr-experiment] that was passed in as `exp`, with an
+#' @returns The [meapr::experiment] that was passed in as `exp`, with an
 #'   additional column `Hz` with values `"< 0.5 Hz"` or `">= 0.5 Hz"` depending
 #'   on the firing rate in the given baseline condition.
 #'

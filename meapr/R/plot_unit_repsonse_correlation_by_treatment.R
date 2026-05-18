@@ -5,7 +5,7 @@
 #'        the x-axis is average firing rate for treatment of column
 #'        the y-axis is average firing rate for treatment of row
 #'
-#' @param experiment [meapr-experiment] data set loaded with
+#' @param experiment [meapr::experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #'
 #' @param extra_layers `list` extra ggplot2 layers to be added to the plot

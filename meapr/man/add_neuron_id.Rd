@@ -7,12 +7,12 @@
 add_neuron_id(exp, exp_name)
 }
 \arguments{
-\item{exp}{\link{meapr-experiment}, a \link{meapr} experiment object}
+\item{exp}{\link{experiment}, a \link{meapr} experiment object}
 
 \item{exp_name}{\code{character} name for the experiment}
 }
 \value{
-The \link{meapr-experiment} that was passed in as \code{exp}, with two
+The \link{experiment} that was passed in as \code{exp}, with two
 additional column, \code{exp_id} with the experiment name given in \code{exp_name}
 and \code{neuron_id} with the \verb{<exp_name>_<neuron_index>}
 }

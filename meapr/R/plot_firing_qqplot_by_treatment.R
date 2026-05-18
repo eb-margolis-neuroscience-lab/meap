@@ -15,7 +15,7 @@
 #'    * if there is bursty or irregular spacing, then the spread off the
 #'      diagonal will be substantial but symmetric
 #'
-#' @param experiment [meapr-experiment] data set loaded with
+#' @param experiment [meapr::experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #'
 #' @param plot_width `numeric` width of the output plot

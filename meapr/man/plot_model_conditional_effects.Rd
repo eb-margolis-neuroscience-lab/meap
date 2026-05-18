@@ -15,7 +15,7 @@ plot_model_conditional_effects(
 )
 }
 \arguments{
-\item{model_fit}{\link[brms:brmsfit-class]{brms::brmsfit} model object}
+\item{model_fit}{\link[brms:brmsfit]{brms::brmsfit} model object}
 
 \item{plot_width}{\code{numeric} width of the output plot}
 

@@ -7,14 +7,14 @@
 label_condition(exp, treatment_label)
 }
 \arguments{
-\item{exp}{\link{meapr-experiment}, a \link{meapr} experiment object}
+\item{exp}{\link{experiment}, a \link{meapr} experiment object}
 
 \item{treatment_label}{\code{character} the label for the treatment to be
 labeled as \code{"treatment"} and everything else will be labeled as
 \code{"control"}}
 }
 \value{
-The \link{meapr-experiment} that was passed in as \code{exp}, with an
+The \link{experiment} that was passed in as \code{exp}, with an
 additional column \code{condition} where which is either \code{"treatment"} or
 \code{"control"}, depending on it is the treatment specified in
 \code{treatment_label}

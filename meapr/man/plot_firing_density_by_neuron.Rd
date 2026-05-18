@@ -7,6 +7,7 @@
 plot_firing_density_by_neuron(
   experiment,
   include_noise = FALSE,
+  extra_layers = list(),
   plot_width = 10,
   plot_height = NULL,
   output_base = "product/plots",
@@ -14,23 +15,28 @@ plot_firing_density_by_neuron(
 )
 }
 \arguments{
-\item{experiment}{\link{meapr-experiment} data set loaded with
+\item{experiment}{\link{experiment} data set loaded with
 \link{load_experiment_matlab} or \link{load_experiment_phy}}
 
 \item{include_noise}{\code{logical} included noise units in the plot?}
+
+\item{extra_layers}{\code{list} extra ggplot2 layers to be added to the plot
+before saving it.}
 
 \item{plot_width}{\code{numeric} width of the output plot}
 
 \item{plot_height}{\code{numeric} height of the output plot. If \code{include_noise},
 the default is \code{10}, otherwise \code{4}.}
 
+\item{output_base}{\code{character} the folder where the plot will be saved}
+
 \item{verbose}{\code{logical} print out verbose output.}
 }
 \value{
 : \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
-\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.pdf}
+\verb{<output_base>/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.pdf}
 and
-\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.png}
+\verb{<output_base>/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.png}
 It save both .pdf and .png because it's easier to email etc small pngs
 while for use in an a manuscript having the vector version means that it`
 can be tweaked with illustrator

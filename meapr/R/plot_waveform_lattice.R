@@ -3,7 +3,7 @@
 #'   Plot a grid of plots, with x-axis in microseconds and y-axis in voltage
 #'   One for each waveform in the waveform data.frame
 #'
-#' @param experiment [meapr-experiment] data set loaded with
+#' @param experiment [meapr::experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #'
 #' @param extra_layers `list` extra ggplot2 layers to be added to the plot

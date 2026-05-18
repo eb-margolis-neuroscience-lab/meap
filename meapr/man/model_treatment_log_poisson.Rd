@@ -21,7 +21,7 @@ model_treatment_log_poisson(
 )
 }
 \arguments{
-\item{experiment}{\link{meapr-experiment} data set loaded with
+\item{experiment}{\link{experiment} data set loaded with
 \link{load_experiment_matlab} or \link{load_experiment_phy}}
 
 \item{output_base}{\code{character} path where the model should be saved. The
@@ -32,9 +32,9 @@ output file is \verb{<output_base>/model_log_poisson_<experiment$tag>.stan}}
 \item{...arguments}{are passed to \link[brms:brm]{brms::brm}}
 }
 \value{
-\link[brms:brmsfit-class]{brms::brmsfit} object with the fit model
+\link[brms:brmsfit]{brms::brmsfit} object with the fit model
 
-\link[brms:brmsfit-class]{brms::brmsfit} object with the fit model
+\link[brms:brmsfit]{brms::brmsfit} object with the fit model
 }
 \description{
 Build a Bayesian hierarchical model for the firing rate

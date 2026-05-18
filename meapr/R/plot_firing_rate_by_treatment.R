@@ -8,7 +8,7 @@
 #'    * overlay points for each neuron jittering horizontally to allow them to
 #'      be seen more easily
 #'
-#' @param experiment [meapr-experiment] data set loaded with
+#' @param experiment [meapr::experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #'
 #' @param extra_layers `list` extra ggplot2 layers to be added to the plot
@@ -27,7 +27,7 @@
 #'@export
 plot_firing_rate_by_treatment <- function(
   experiment,
-  extra_layers = list()
+  extra_layers = list(),
   plot_width = 6,
   plot_height = 6,
   output_base = "product/plots",

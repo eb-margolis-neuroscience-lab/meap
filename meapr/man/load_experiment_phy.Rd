@@ -32,7 +32,7 @@ cached: \verb{<save_path>/<experiment_tag>}}
 \item{verbose}{\code{logical} print out verbose output}
 }
 \value{
-\link{meapr-experiment} S3 class with the following elements
+\link{experiment} S3 class with the following elements
 \itemize{
 \item{\strong{tag: }}{<experiment_tag>}
 \item{\strong{treatment: }}{\code{\link[tibble]{tibble}} with columns
@@ -47,7 +47,7 @@ each detected firing}
 }
 }
 \description{
-(Phy)\link{https://github.com/cortex-lab/phy} is a data exchange
+\href{https://github.com/cortex-lab/phy}{Phy} is a data exchange
 framework for electrophysiology data. For example, the SpyKING Circus spike
 sorter data can be exported in phy format. This function will load data from
 the export in the \verb{*.modat.GUI/} folder

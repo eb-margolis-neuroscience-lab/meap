@@ -8,7 +8,7 @@
 #'  accounted for in a model of effects of the treatment on the average firing
 #'  rate
 #'
-#' @param experiment [meapr-experiment] data set loaded with
+#' @param experiment [meapr::experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #' @param bins `numeric` number of histogram bins to use
 #' @param extra_layers `list` extra ggplot2 layers to be added to the plot

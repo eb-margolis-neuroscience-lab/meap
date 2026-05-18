@@ -7,12 +7,12 @@
 label_Hz(exp, baseline_treatment_name = "Baseline")
 }
 \arguments{
-\item{exp}{\link{meapr-experiment}, a \link{meapr} experiment object}
+\item{exp}{\link{experiment}, a \link{meapr} experiment object}
 
 \item{baseline_treatment_name}{\code{character} name of the baseline treatment}
 }
 \value{
-The \link{meapr-experiment} that was passed in as \code{exp}, with an
+The \link{experiment} that was passed in as \code{exp}, with an
 additional column \code{Hz} with values \code{"< 0.5 Hz"} or \code{">= 0.5 Hz"} depending
 on the firing rate in the given baseline condition.
 }

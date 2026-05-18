@@ -11,7 +11,7 @@
 #'
 #'
 #'
-#' @param experiment [meapr-experiment] data set loaded with
+#' @param experiment [meapr::experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #' @param baseline_treatment_name `character` name of the baseline treatment
 #' @param event_reshold `numeric` how many events should be used to set the

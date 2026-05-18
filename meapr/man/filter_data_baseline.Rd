@@ -7,7 +7,7 @@
 filter_data_baseline(exp, lower, upper, baseline_treatment_name = "Baseline")
 }
 \arguments{
-\item{exp}{\link{meapr-experiment}, a \link{meapr} experiment object}
+\item{exp}{\link{experiment}, a \link{meapr} experiment object}
 
 \item{lower}{\code{numeric} lower firing rate to filter by (inclusive)}
 
@@ -16,7 +16,7 @@ filter_data_baseline(exp, lower, upper, baseline_treatment_name = "Baseline")
 \item{baseline_treatment_name}{\code{character} name of the baseline treatment}
 }
 \value{
-The \link{meapr-experiment} that was passed in as \code{exp}, but with only
+The \link{experiment} that was passed in as \code{exp}, but with only
 the neurons where the firing rate is within
 \verb{lower <= <firing_rate> <= upper}
 }

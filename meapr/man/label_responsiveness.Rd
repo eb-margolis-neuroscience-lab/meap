@@ -7,14 +7,14 @@
 label_responsiveness(exp, min_threshold, max_threshold)
 }
 \arguments{
-\item{exp}{\link{meapr-experiment}, a \link{meapr} experiment object}
+\item{exp}{\link{experiment}, a \link{meapr} experiment object}
 
 \item{min_threshold}{\code{numeric} lower firing rate threshold for responsiveness}
 
 \item{max_threshold}{\code{numeric} upper firing rate threshold for responsiveness}
 }
 \value{
-The \link{meapr-experiment} that was passed in as \code{exp}, with an
+The \link{experiment} that was passed in as \code{exp}, with an
 additional column \code{responsive} taking values
 \verb{["decreasing", "increasing", "low_response"]}, depending on whether the
 the where the normalized firing rate for the treatment condition below the

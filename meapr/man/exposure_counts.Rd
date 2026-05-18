@@ -7,7 +7,7 @@
 exposure_counts(exp)
 }
 \arguments{
-\item{exp}{\link{meapr-experiment}, a \link{meapr} experiment object}
+\item{exp}{\link{experiment}, a \link{meapr} experiment object}
 }
 \value{
 \code{data.frame} with one treatment per row, and columns

@@ -7,6 +7,7 @@
 plot_firing_qqplot_by_treatment(
   experiment,
   highlight_units = NULL,
+  extra_layers = list(),
   plot_width = 7,
   plot_height = 4,
   output_base = "product/plots",
@@ -14,8 +15,11 @@ plot_firing_qqplot_by_treatment(
 )
 }
 \arguments{
-\item{experiment}{\link{meapr-experiment} data set loaded with
+\item{experiment}{\link{experiment} data set loaded with
 \link{load_experiment_matlab} or \link{load_experiment_phy}}
+
+\item{extra_layers}{\code{list} extra ggplot2 layers to be added to the plot
+before saving it.}
 
 \item{plot_width}{\code{numeric} width of the output plot}
 

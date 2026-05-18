@@ -35,7 +35,7 @@ treatments are not disjoint and given chronologically.}
 \item{experiment_tag}{\code{character} an identifier for the experiment, set
 in the return data structure and path to save to disk if null (default),
 then use \code{treatments |> basename() |> stringr::str_replace(".mat$",
-  "")}}
+"")}}
 
 \item{time_steps_per_second}{\code{numeric} scaling factor to convert time steps
 to seconds. E.g. if the recording is done at 20k Hz, then use \code{20000}.}
@@ -46,7 +46,7 @@ cached: \verb{<save_path>/<experiment_tag>}}
 \item{verbose}{\code{logical} print out verbose output.}
 }
 \value{
-\link{meapr-experiment} S3 class with the following elements
+\link{experiment} S3 class with the following elements
 \itemize{
 \item{\strong{tag: }}{<experiment_tag>}
 \item{\strong{treatment: }}{\code{\link[tibble]{tibble}} with columns

@@ -2,7 +2,7 @@
 #'
 #'   Plot a correlation matrix as a heatmap between all waveforms in the experiment
 #'
-#' @param experiment [meapr-experiment] data set loaded with
+#' @param experiment [meapr::experiment] data set loaded with
 #'   [load_experiment_matlab] or [load_experiment_phy]
 #'
 #' @param plot_width `numeric` width of the output plot.

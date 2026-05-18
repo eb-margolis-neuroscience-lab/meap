@@ -13,17 +13,19 @@ plot_waveform_correlation_matrix(
 )
 }
 \arguments{
-\item{experiment}{\link{meapr-experiment} data set loaded with
+\item{experiment}{\link{experiment} data set loaded with
 \link{load_experiment_matlab} or \link{load_experiment_phy}}
 
-\item{plot_width}{\code{numeric} width of the output plot}
+\item{plot_width}{\code{numeric} width of the output plot.}
 
-\item{plot_height}{\code{numeric} height of the output plot}
+\item{plot_height}{\code{numeric} height of the output plot.}
 
-\item{verbose}{\code{logical} print out verbose output}
+\item{output_base}{\code{character} where to output plots.}
+
+\item{verbose}{\code{logical} print out verbose output.}
 }
 \value{
-: \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
+NULL, it saves the result to
 \verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.(pdf|png)}
 It save both .pdf and .png because it's easier to email etc small pngs
 while for use in an a manuscript having the vector version means that it`
