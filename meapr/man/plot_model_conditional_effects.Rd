@@ -7,6 +7,7 @@
 plot_model_conditional_effects(
   model_fit,
   model_tag,
+  extra_layers = list(),
   plot_width = 6,
   plot_height = 6,
   output_base = "product/plots",
@@ -17,16 +18,23 @@ plot_model_conditional_effects(
 \arguments{
 \item{model_fit}{\link[brms:brmsfit]{brms::brmsfit} model object}
 
-\item{plot_width}{\code{numeric} width of the output plot}
+\item{model_tag}{\code{character} tag for the model}
 
-\item{plot_height}{\code{numeric} height of the output plot}
+\item{extra_layers}{\code{list} extra ggplot2 layers to be added to the plot
+before saving it.}
 
-\item{verbose}{\code{logical} print out verbose output}
+\item{plot_width}{\code{numeric} width of the output plot.}
+
+\item{plot_height}{\code{numeric} height of the output plot.}
+
+\item{output_base}{\code{character} where to output plots.}
+
+\item{verbose}{\code{logical} print out verbose output.}
 }
 \value{
 : \link[ggplot2:ggplot]{ggplot2::ggplot} of the plot and it saves the result to
-\verb{product/plots/firing_qqplot_by_treatment_<experiment_tag>_<date_code>.(pdf|png)}
-It save both .pdf and .png because it's easier to email etc small pngs
+\verb{<output_base>/marginal_effects_<model_tag>_<date_code>.(pdf|png)}
+It save both .pdf and .png because it's easier to email etc small png files
 while for use in an a manuscript having the vector version means that it`
 can be tweaked with illustrator
 }
