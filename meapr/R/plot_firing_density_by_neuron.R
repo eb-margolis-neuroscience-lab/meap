@@ -9,6 +9,10 @@
 #' @param include_noise `logical` included noise units in the plot?
 #' @param extra_layers `list` extra ggplot2 layers to be added to the plot
 #'   before saving it.
+#' @param treatments `data.frame` with columns ['treatment', 'begin', 'end'] that
+#'   is used to demarcate and label the treatments. If it is not provided, then
+#'   the one from the experiment is used. In that case, the treatment index is removed
+#'   from the beginning of the treatment label.
 #' @param plot_width `numeric` width of the output plot
 #' @param plot_height `numeric` height of the output plot. If `include_noise`,
 #'   the default is `10`, otherwise `4`.
@@ -69,8 +73,7 @@ plot_firing_density_by_neuron <- function(
         "['", paste0(names(treatments), collapse = "', '"), "']"))
     }
   }
-  
-  
+
   data <- experiment$firing |>
     dplyr::select(neuron_index, time_step) |>
     dplyr::mutate(group = "Good Units", .before = 1)
