@@ -29,6 +29,7 @@ plot_firing_density_by_neuron <- function(
   experiment,
   include_noise = FALSE,
   extra_layers = list(),
+  treatments = NULL,
   plot_width = 10,
   plot_height = NULL,
   output_base = "product/plots",
@@ -54,6 +55,22 @@ plot_firing_density_by_neuron <- function(
     return(NULL)
   }
 
+  if (is.null(treatments)) {
+    treatments <- experiment$treatments |>
+      dplyr::mutate(
+        treatment = treatment |>
+          stringr::str_replace("^[0-9]+_", ""))
+  }
+  else {
+    if (!all(c("treatment", "begin", "end") %in% names(treatments))) {
+      warning(paste0(
+        "The treatment labels should have the following columns ",
+        "['treatment', 'begin', 'end'], instead it has ",
+        "['", paste0(names(treatments), collapse = "', '"), "']"))
+    }
+  }
+  
+  
   data <- experiment$firing |>
     dplyr::select(neuron_index, time_step) |>
     dplyr::mutate(group = "Good Units", .before = 1)
@@ -123,12 +140,12 @@ plot_firing_density_by_neuron <- function(
       subtitle = experiment$tag) +
     ggplot2::scale_x_continuous(
       name = "Seconds",
-      breaks = round(experiment$treatments$begin, 1),
+      breaks = round(treatments$begin, 1),
       expand = c(0, 0),
       sec.axis = ggplot2::dup_axis(
         name = NULL,
-        breaks = with(experiment$treatments, begin + (end - begin) / 2),
-        labels = experiment$treatments$treatment)) +
+        breaks = with(treatments, begin + (end - begin) / 2),
+        labels = treatments$treatment)) +
     ggplot2::scale_y_discrete(
       name = "Neuron Index",
       expand = c(0, 0)) +
@@ -136,7 +153,8 @@ plot_firing_density_by_neuron <- function(
     ggplot2::theme(
       legend.position = "bottom",
       axis.text.x.top = ggplot2::element_text(
-        angle = 10, hjust = 0.2, vjust = 0.1)) +
+        angle = 20, hjust = 0.2, vjust = 0.1),
+      plot.margin = margin(t = 5.5, r = 30, b = 5.5, l = 5.5, unit = "pt")) +
     extra_layers
 
   if (include_noise) {
