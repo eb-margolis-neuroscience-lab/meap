@@ -28,8 +28,12 @@ pddata = pd.read_csv(open(input_filepath
                      dtype={"time_secs": float, "phase": str, "ch1": str}, engine='python')
 dataextract = pddata[~pddata['phase'].isnull()]
 dataextract = dataextract[~dataextract['time_secs'].isnull()]
+firstrow = pd.DataFrame({'time_secs':['1'], 'phase':['aCSF']})
+#remove row with epoch called "baseline"
+if dataextract.iloc[0]['phase'] == 'Baseline':
+    dataextract = dataextract.iloc[1:]
 lastrow = pd.DataFrame({'time_secs':[pddata['time_secs'].max()], 'phase':['END']})
-dataextract = pd.concat([dataextract, lastrow], ignore_index = True)
+dataextract = pd.concat([firstrow, dataextract, lastrow], ignore_index = True)
 dataextract['time_secs'] = dataextract['time_secs'].astype(int)
 
 #enable interactive table, update the dataframe when cell values are changed
